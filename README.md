@@ -1,3 +1,3 @@
 Autonomous Traffic Simulator
 ============================
-Simulates self-driving cars
+Simulates self-driving cars.
