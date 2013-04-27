@@ -106,6 +106,19 @@ typedef struct {
 
 /**********************************FUNCTION PROTOTYPES************************/
 
+// Initialization of an intersection:
+void intersection_startup(intersection_state*, tw_lp*);
+
+// Event handler for an intersection:
+void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+
+// Reverse event handler for an intersection:
+void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*,
+										tw_lp*);
+
+// Function to collection statistics for an intersection:
+void intersection_statistics_collectstats(intersection_state*, tw_lp *);
+
 /*******************************END FUNCTION PROTOTYPES***********************/
 
 // Main Function:
