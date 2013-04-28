@@ -41,6 +41,9 @@ enum events { LIGHT_CHANGE, CAR_ARRIVES };
 // Traffic lights enumeration:
 enum light_colors { RED, GREEN };
 
+// Directions to determine which way traffic is permitted in an intersection:
+enum directions { NORTH_SOUTH, EAST_WEST };
+
 /**************************************** END ENUMS BLOCK ***********************/
 
 /** STRUCTS **/
@@ -54,6 +57,8 @@ typedef struct {
 	// Variables to hold the destination's X and Y coordinates:
 	int x_to_go;
 	int y_to_go;
+	// Enumeration to hold the current direction:
+	//enum directions current_direction;
 } car_type;
 
 // Message repesentation:
@@ -100,10 +105,16 @@ typedef struct {
 	int number_of_east_lanes;
 	
 	// Describes whether a direction will get a green arrow:
-	int north_has_green_arrow;
-	int south_has_green_arrow;
-	int west_has_green_arrow;
-	int east_has_green_arrow;
+	int has_green_arrow;
+
+	// Variable to hold the time remaining on the intersection:
+	int time_remaining;
+
+	// Variable to hold the total time that this light waits:
+	int total_time;
+
+	// Variable to hold the direction the lights are going:
+	enum directions traffic_direction;
 } intersection_state;
 
 /** END STRUCTS BLOCK **/
@@ -144,6 +155,59 @@ tw_lptype mylps[] = {
     },
     { 0 },
 };
+
+// Event handler for an intersection:
+void intersection_eventhandler(intersection_state* SV, tw_bf* CV, 
+								message_data* M, tw_lp* LP) {
+
+	// Time warp starting time:
+	tw_stime ts = 0.0;
+	
+	// Current event:
+	tw_event* current_event = NULL;
+
+	// New message data:
+	message_data* new_message = NULL;
+
+	// Unknown time warp bit field:
+	*(int* ) CV = (int) 0;
+	
+	// Handle the events defined in the "events" enumeration:
+	switch(M->event_type) {
+
+		// Handle the LIGHT_CHANGE event IF AND ONLY IF the time remaining on this intersection == 0:
+		case LIGHT_CHANGE:
+			
+			// TIME EXPIRED!
+
+			// Check if the traffic is permitted north-south (green on north and south lights):
+			if(SV->traffic_direction == NORTH_SOUTH) {
+				
+				// Change permitted direction to east-west (green on east and west lights):
+				SV->traffic_direction = EAST_WEST;
+
+				// Turn off all the north and south lights to RED:
+				int i;
+				// North Lanes:
+				for(i = 0; i < SV->number_of_north_lanes; i++) {
+					SV->north_lanes[i].light = RED;
+				}
+	
+				// South Lanes:
+				for(i = 0; i < SV->number_of_south_lanes; i++) {
+					SV->south_lanes[i].light = RED;
+				}
+
+				// Turn on all the east and west lanes to GREEN:
+				
+			}
+			
+			// Reset the time_remaining to the initial time:
+			time_remaining = total_time;
+			break;
+
+	}
+} /** END FUNCTION intersection_eventhandler **/
 
 // Main Function:
 int main(int argc, char* argv[]) {
