@@ -233,41 +233,78 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 					}
 				}
 			} else if(SV->traffic_direction == EAST_WEST) {
-	
-				// Change permitted direction to north-south:
-				SV->traffic_direction = NORTH_SOUTH;
-
-				// Turn off all the east and west lights to RED:
-				int i;
-				// East Lanes:
-				for(i = 0; i < SV->number_of_east_lanes; i++) {
-					SV->east_lanes[i].light = RED;
-				}
-	
-				// West Lanes:
-				for(i = 0; i < SV->number_of_west_lanes; i++) {
-					SV->west_lanes[i].light = RED;
-				}
-
-				// Check if there are left-turning lanes:
-				if(SV->has_green_arrow) { 
-					// Left-turning lanes exist:
-					SV->north_lanes[0].light = GREEN;
-					SV->south_lanes[0].light = GREEN;
+				
+				// Check if the left turning light is on (if any):
+				if(SV->has_green_arrow) {
+					// Check if this left-turn is GREEN:
+					if(SV->east_lanes[0].light == GREEN) {
+						// Turn the left-turn arrow to RED; turn on lanes to green:
+						SV->east_lanes[0].light = SV->west_lanes[0].light = RED;
+						
+						int i;
+						for(i = 1; i < number_of_east_lanes; i++) {
+							SV->east_lanes[i].light = GREEN;
+						}
+						
+						for(i = 1; i < number_of_west_lanes; i++) {
+							SV->west_lanes[i].light = GREEN;
+						}
+						
+						// Set the remaining time to total time:
+						remaining_time = total_time;
+					} else {
+						// The left turn is RED; changing direction to NORTH SOUTH:
+						
+						// Change permitted direction to north-south (green on north and south lights):
+						SV->traffic_direction = NORTH_SOUTH;
+						
+						// Turn off all the north and south lights to RED:
+						int i;
+						// East Lanes:
+						for(i = 0; i < SV->number_of_esat_lanes; i++) {
+							SV->north_lanes[i].light = RED;
+						}
+						
+						// West Lanes:
+						for(i = 0; i < SV->number_of_west_lanes; i++) {
+							SV->south_lanes[i].light = RED;
+						}
+						
+						// Left-turning lanes exist:
+						SV->north_lanes[0].light = GREEN;
+						SV->south_lanes[0].light = GREEN;
+						
+						// Set the left total time to the total time:
+						time_remaining = left_total_time;
+					}
 				} else {
-					// Otherwise, turn everything ON!
-					for(i = 0; i < SV->number_of_north_lanes; i++) {
+					// This intersection does not have any green left arrows; just change direction:
+					
+					// Change permitted direction to north-south (green on north and south lights):
+					SV->traffic_direction = NORTH_SOUTH;
+					
+					int i;
+					
+					// East Lanes:
+					for(i = 0; i < SV->number_of_east_lanes; i++) {
+						SV->east_lanes[i].light = RED;
+					}
+					
+					// West Lanes:
+					for(i = 0; i < SV->number_of_west_lanes; i++) {
+						SV->west_lanes[i].light = RED;
+					}
+					
+					// Change the North-South lanes to GREEN:
+					for(i = 0; i < number_of_north_lanes; i++) {
 						SV->north_lanes[i].light = GREEN;
 					}
-
-					for(i = 0; i < SV->number_of_south_lanes; i++) {
+					
+					for(i = 1; i < number_of_south_lanes; i++) {
 						SV->south_lanes[i].light = GREEN;
 					}
 				}
-			} 
-			
-			// Reset the time_remaining to the initial time:
-			time_remaining = total_time;
+			}
 			break;
 
 	}
