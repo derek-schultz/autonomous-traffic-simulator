@@ -229,8 +229,8 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 					} 
 
 					for(i = 1; i < number_of_west_lanes; i++) {
-						SV->west_lanes[i].light = GREEN;
-					}
+							SV->west_lanes[i].light = GREEN;
+						}
 				}
 			} else if(SV->traffic_direction == EAST_WEST) {
 	
