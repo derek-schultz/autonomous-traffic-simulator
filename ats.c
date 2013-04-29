@@ -179,7 +179,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 						}
 
 						// Set the remaining time to total time:
-						remaining_time = total_time;
+						SV->time_remaining = SV->total_time;
 					} else {
 						// The left turn is RED; changing direction to EAST WEST:
 
@@ -203,7 +203,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 						SV->west_lanes[0].light = GREEN;
 
 						// Set the left total time to the total time:
-						time_remaining = left_total_time;
+						SV->time_remaining = SV->left_total_time;
 					} 
 				} else {
 					// This intersection does not have any green left arrows; just change direction:
@@ -231,6 +231,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 					for(i = 1; i < number_of_west_lanes; i++) {
 						SV->west_lanes[i].light = GREEN;
 					}
+					SV->time_remaining = SV->total_time;
 				}
 			} else if(SV->traffic_direction == EAST_WEST) {
 				
@@ -251,7 +252,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 						}
 						
 						// Set the remaining time to total time:
-						remaining_time = total_time;
+						SV->remaining_time = SV->total_time;
 					} else {
 						// The left turn is RED; changing direction to NORTH SOUTH:
 						
@@ -275,7 +276,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 						SV->south_lanes[0].light = GREEN;
 						
 						// Set the left total time to the total time:
-						time_remaining = left_total_time;
+						SV->time_remaining = SV->left_total_time;
 					}
 				} else {
 					// This intersection does not have any green left arrows; just change direction:
@@ -303,8 +304,28 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 					for(i = 1; i < number_of_south_lanes; i++) {
 						SV->south_lanes[i].light = GREEN;
 					}
+					SV->time_remaining = SV->total_time;
 				}
 			}
+			
+			ts = tw_rand_exponential(lp->rng, MEAN_SERVICE);
+			current_event = tw_event_new(lp->gid, ts, lp);
+			new_message = (Msg_Data *)tw_event_data(CurEvent);
+			new_message->car.x_to_go = M->car.x_to_go;
+			new_message->car.y_to_go = M->car.y_to_go;
+			new_message->car.current_lane = M->car.current_lane;
+			new_message->car.sent_back = M->car.sent_back;
+			new_message->car.arrived_from = M->car.arrived_from;
+			new_message->car.in_out = M->car.in_out;
+			new_message->event_type = DIRECTION_SELECT;
+			//printf("send ari ");
+			tw_event_send(current_event);
+			
+			break;
+			
+			
+		case CAR_ARRIVES:
+			
 			break;
 
 	}
