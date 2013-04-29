@@ -252,7 +252,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 						}
 						
 						// Set the remaining time to total time:
-						SV->remaining_time = SV->total_time;
+						SV->time_remaining = SV->total_time;
 					} else {
 						// The left turn is RED; changing direction to NORTH SOUTH:
 						
@@ -313,11 +313,9 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 			new_message = (Msg_Data *)tw_event_data(CurEvent);
 			new_message->car.x_to_go = M->car.x_to_go;
 			new_message->car.y_to_go = M->car.y_to_go;
-			new_message->car.current_lane = M->car.current_lane;
-			new_message->car.sent_back = M->car.sent_back;
-			new_message->car.arrived_from = M->car.arrived_from;
-			new_message->car.in_out = M->car.in_out;
-			new_message->event_type = DIRECTION_SELECT;
+			new_message->car.start_time = M->car.start_time;
+			new_message->car.end_time = M->car.end_time;
+			new_message->event_type = CAR_ARRIVES;
 			//printf("send ari ");
 			tw_event_send(current_event);
 			
