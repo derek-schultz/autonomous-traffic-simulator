@@ -40,10 +40,6 @@ enum light_colors { RED, GREEN };
 // Directions to determine which way traffic is permitted in an intersection:
 enum directions { NORTH_SOUTH, EAST_WEST };
 
-// To determine the orientation of the car
-enum orientation {NORTH_LEFT, NORTH_CENTER, NORTH_RIGHT, SOUTH_LEFT, SOUTH_CENTER, SOUTH_RIGHT,
-					EAST_LEFT, EAST_CENTER, EAST_RIGHT, WEST_LEFT, WEST_CENTER, WEST_RIGHT}
-
 /**************************************** END ENUMS BLOCK ***********************/
 
 /** STRUCTS **/
@@ -57,8 +53,6 @@ typedef struct {
 	// Variables to hold the destination's X and Y coordinates:
 	int x_to_go;
 	int y_to_go;
-	// Enumeration to hold the current direction:
-	enum orientation current_orientation;
 } car_type;
 
 // Message repesentation:
@@ -326,44 +320,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			break;
 			
 		case CAR_ARRIVES:
-			switch(M->car_type.orientation) {
-				case NORTH_LEFT:
-					break;
-					
-				case NORTH_CENTER:
-					break;
-					
-				case NORTH_RIGHT:
-					break;
-					
-				case SOUTH_LEFT:
-					break;
-					
-				case SOUTH_CENTER:
-					break;
-					
-				case SOUTH_RIGHT:
-					break;
-					
-				case EAST_LEFT:
-					break;
-					
-				case EAST_CENTER:
-					break;
-					
-				case EAST_RIGHT:
-					break;
-					
-				case WEST_LEFT:
-					break;
-					
-				case WEST_CENTER:
-					break;
-					
-				case WEST_RIgHT:
-					break;
-					
-			}
+			
 			break;
 
 	}
