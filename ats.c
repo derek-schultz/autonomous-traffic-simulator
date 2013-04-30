@@ -40,10 +40,6 @@ enum light_colors { RED, GREEN };
 // Directions to determine which way traffic is permitted in an intersection:
 enum directions { NORTH_SOUTH, EAST_WEST };
 
-// To determine the orientation of the car
-enum orientation {NORTH_LEFT, NORTH_CENTER, NORTH_RIGHT, SOUTH_LEFT, SOUTH_CENTER, SOUTH_RIGHT,
-					EAST_LEFT, EAST_CENTER, EAST_RIGHT, WEST_LEFT, WEST_CENTER, WEST_RIGHT}
-
 /**************************************** END ENUMS BLOCK ***********************/
 
 /** STRUCTS **/
@@ -57,8 +53,6 @@ typedef struct {
 	// Variables to hold the destination's X and Y coordinates:
 	int x_to_go;
 	int y_to_go;
-	// Enumeration to hold the current direction:
-	enum orientation current_orientation;
 } car_type;
 
 // Message repesentation:
@@ -124,21 +118,21 @@ typedef struct {
 /**********************************FUNCTION PROTOTYPES************************/
 
 // Initialization of an intersection:
-void intersection_startup(intersection_state*, tw_lp*);
+void intersection_startup(intersection_state*, tw_LP*);
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_LP*);
 
 // Reverse event handler for an intersection:
-void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_LP*);
 
 // Function to collection statistics for an intersection:
-void intersection_statistics_collectstats(intersection_state*, tw_lp *);
+void intersection_statistics_collectstats(intersection_state*, tw_LP *);
 
 /*******************************END FUNCTION PROTOTYPES***********************/
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
+void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_LP* LP) {
 
 	// Time warp starting time:
 	tw_stime ts = 0.0;
@@ -152,9 +146,18 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 	// Unknown time warp bit field:
 	*(int* ) CV = (int) 0;
 	
+	
+	// Subtract one from the remaining time until it is 0
+	
+	if(SV->time_remaining == 0)
+	{
+		M->event_type = LIGHT_CHANGE;
+	}
 	// Handle the events defined in the "events" enumeration:
 	switch(M->event_type) {
-
+			
+		SV->time_remaining--;
+			
 		// Handle the LIGHT_CHANGE event IF AND ONLY IF the time remaining on this intersection == 0:
 		case LIGHT_CHANGE:
 			
@@ -309,69 +312,36 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				}
 			}
 			
-			ts = tw_rand_exponential(lp->rng, MEAN_SERVICE);
-			current_event = tw_event_new(lp->gid, ts, lp);
-			new_message = (Msg_Data *)tw_event_data(CurEvent);
+			ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+			current_event = tw_event_new(LP->gid, ts, LP);
+			new_message = (Msg_Data *)tw_event_data(current_event);
+			new_message->car.x_to_go = M->car.x_to_go;
+			new_message->car.y_to_go = M->car.y_to_go;
+			new_message->car.start_time = M->car.start_time;
+			new_message->car.end_time = M->car.end_time;
+			// change event to a car arriving now that light has changed
+			new_message->event_type = CAR_ARRIVES;
+			//printf("send ari ");
+			tw_event_send(current_event);
+			
+			break;
+			
+		case CAR_ARRIVES:
+			
+			LP->gid = Cell_ComputeMove(LP->gid, 0);
+			ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+			current_event = tw_event_new(LP->gid, ts, LP);
+			new_message = (Msg_Data *) tw_event_data(current_event);
 			new_message->car.x_to_go = M->car.x_to_go;
 			new_message->car.y_to_go = M->car.y_to_go;
 			new_message->car.start_time = M->car.start_time;
 			new_message->car.end_time = M->car.end_time;
 			new_message->event_type = CAR_ARRIVES;
-			//printf("send ari ");
 			tw_event_send(current_event);
 			
-			// change event to a car arriving now that light has changed
-			SV->event_type = CAR_ARRIVES;
-			
-			break;
-			
-		case CAR_ARRIVES:
-			switch(M->car_type.orientation) {
-				case NORTH_LEFT:
-					break;
-					
-				case NORTH_CENTER:
-					break;
-					
-				case NORTH_RIGHT:
-					break;
-					
-				case SOUTH_LEFT:
-					break;
-					
-				case SOUTH_CENTER:
-					break;
-					
-				case SOUTH_RIGHT:
-					break;
-					
-				case EAST_LEFT:
-					break;
-					
-				case EAST_CENTER:
-					break;
-					
-				case EAST_RIGHT:
-					break;
-					
-				case WEST_LEFT:
-					break;
-					
-				case WEST_CENTER:
-					break;
-					
-				case WEST_RIgHT:
-					break;
-					
-			}
 			break;
 
 	}
-	
-	// Subtract one from the remaining time until it is 0
-	SV->time_remaining--;
-	if(SV->time_remaining == 0)
-		SV->event_type = LIGHT_CHANGE;
 } /** END FUNCTION intersection_eventhandler **/
 
 
