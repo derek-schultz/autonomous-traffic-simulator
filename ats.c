@@ -130,8 +130,7 @@ void intersection_startup(intersection_state*, tw_lp*);
 void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 
 // Reverse event handler for an intersection:
-void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*,
-										tw_lp*);
+void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 
 // Function to collection statistics for an intersection:
 void intersection_statistics_collectstats(intersection_state*, tw_lp *);
@@ -139,8 +138,7 @@ void intersection_statistics_collectstats(intersection_state*, tw_lp *);
 /*******************************END FUNCTION PROTOTYPES***********************/
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state* SV, tw_bf* CV, 
-								message_data* M, tw_lp* LP) {
+void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
 
 	// Time warp starting time:
 	tw_stime ts = 0.0;
@@ -322,6 +320,9 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 			//printf("send ari ");
 			tw_event_send(current_event);
 			
+			// change event to a car arriving now that light has changed
+			SV->event_type = CAR_ARRIVES;
+			
 			break;
 			
 		case CAR_ARRIVES:
@@ -366,6 +367,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 			break;
 
 	}
+	
+	// Subtract one from the remaining time until it is 0
+	SV->time_remaining--;
+	if(SV->time_remaining == 0)
+		SV->event_type = LIGHT_CHANGE;
 } /** END FUNCTION intersection_eventhandler **/
 
 
