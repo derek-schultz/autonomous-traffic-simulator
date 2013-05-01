@@ -125,15 +125,21 @@ typedef struct {
 
 // Initialization of an intersection:
 void intersection_startup(intersection_state*, tw_lp*);
+// Temp
+void intersection_startup(intersection_state* s, tw_lp* l) { }
 
 // Event handler for an intersection:
 void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 
 // Reverse event handler for an intersection:
 void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+// Temp
+void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
 
 // Function to collection statistics for an intersection:
 void intersection_statistics_collectstats(intersection_state*, tw_lp*);
+// Temp
+void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
@@ -191,7 +197,7 @@ tw_lptype mylps[] = {
 };
 
 //Command Line Arguments
-extern unsigned int autonomous;
+unsigned int autonomous;
 
 const tw_optdef model_opts[] = {
     TWOPT_GROUP("Traffic Model"),
@@ -202,6 +208,7 @@ const tw_optdef model_opts[] = {
 // Main Function:
 int main(int argc, char* argv[]) {
 
+    tw_opt_add(model_opts);
     tw_init(&argc, &argv);
 
 
@@ -295,6 +302,50 @@ void traffic_grid_mapping() {
     }
 }
 
+tw_lpid cell_compute_move(tw_lpid lpid, int direction)
+{
+    tw_lpid lpid_x, lpid_y;
+    tw_lpid n_x, n_y;
+    tw_lpid dest_lpid;
+
+    lpid_y = lpid / MAP_WIDTH;
+    lpid_x = lpid - (lpid_y * MAP_WIDTH);
+
+    switch(direction)
+    {
+    case 0:
+        // West
+        n_x = ((lpid_x - 1) + MAP_WIDTH) % MAP_WIDTH;
+        n_y = lpid_y;
+        break;
+
+    case 1:
+        // East
+        n_x = (lpid_x + 1) % MAP_WIDTH;
+        n_y = lpid_y;
+        break;
+
+    case 2:
+        // South
+        n_x = lpid_x;
+        n_y = ((lpid_y - 1) + MAP_HEIGHT) % MAP_HEIGHT;
+        break;
+
+    case 3:
+        // North
+        n_x = lpid_x;
+        n_y = (lpid_y + 1) % MAP_HEIGHT;
+        break;
+
+    default:
+        tw_error(TW_LOC, "Bad direction value \n");
+    }
+
+    dest_lpid = (tw_lpid) (n_x + (n_y * MAP_WIDTH));
+    // printf("ComputeMove: Src LP %llu (%d, %d), Dir %u, Dest LP %llu (%d, %d)\n", lpid, lpid_x, lpid_y, direction, dest_lpid, n_x, n_y);
+    return dest_lpid;
+}
+
 // Event handler for an intersection:
 void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
 
@@ -308,7 +359,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
     message_data* new_message = NULL;
 
     // Unknown time warp bit field:
-    *(int* ) CV = (int) 0;
+    *(int*) CV = (int) 0;
     
     
     // Subtract one from the remaining time until it is 0
@@ -338,11 +389,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                         SV->north_lanes[0].light = SV->south_lanes[0].light = RED;
                         
                         int i;
-                        for(i = 1; i < number_of_north_lanes; i++) {    
+                        for(i = 1; i < SV->number_of_north_lanes; i++) {    
                             SV->north_lanes[i].light = GREEN;
                         } 
 
-                        for(i = 1; i < number_of_south_lanes; i++) {
+                        for(i = 1; i < SV->number_of_south_lanes; i++) {
                             SV->south_lanes[i].light = GREEN;
                         }
 
@@ -392,11 +443,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                     }
                 
                     // Change the East-West lanes to GREEN:
-                    for(i = 0; i < number_of_east_lanes; i++) { 
+                    for(i = 0; i < SV->number_of_east_lanes; i++) { 
                         SV->east_lanes[i].light = GREEN;
                     } 
 
-                    for(i = 1; i < number_of_west_lanes; i++) {
+                    for(i = 1; i < SV->number_of_west_lanes; i++) {
                         SV->west_lanes[i].light = GREEN;
                     }
                     SV->time_remaining = SV->total_time;
@@ -411,11 +462,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                         SV->east_lanes[0].light = SV->west_lanes[0].light = RED;
                         
                         int i;
-                        for(i = 1; i < number_of_east_lanes; i++) {
+                        for(i = 1; i < SV->number_of_east_lanes; i++) {
                             SV->east_lanes[i].light = GREEN;
                         }
                         
-                        for(i = 1; i < number_of_west_lanes; i++) {
+                        for(i = 1; i < SV->number_of_west_lanes; i++) {
                             SV->west_lanes[i].light = GREEN;
                         }
                         
@@ -430,7 +481,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                         // Turn off all the north and south lights to RED:
                         int i;
                         // East Lanes:
-                        for(i = 0; i < SV->number_of_esat_lanes; i++) {
+                        for(i = 0; i < SV->number_of_east_lanes; i++) {
                             SV->north_lanes[i].light = RED;
                         }
                         
@@ -465,11 +516,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                     }
                     
                     // Change the North-South lanes to GREEN:
-                    for(i = 0; i < number_of_north_lanes; i++) {
+                    for(i = 0; i < SV->number_of_north_lanes; i++) {
                         SV->north_lanes[i].light = GREEN;
                     }
                     
-                    for(i = 1; i < number_of_south_lanes; i++) {
+                    for(i = 1; i < SV->number_of_south_lanes; i++) {
                         SV->south_lanes[i].light = GREEN;
                     }
                     SV->time_remaining = SV->total_time;
@@ -478,7 +529,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             
             ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
             current_event = tw_event_new(LP->gid, ts, LP);
-            new_message = (Msg_Data *)tw_event_data(current_event);
+            new_message = (message_data*)tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
             new_message->car.y_to_go = M->car.y_to_go;
             new_message->car.start_time = M->car.start_time;
@@ -492,10 +543,10 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             
         case CAR_ARRIVES:
             
-            LP->gid = Cell_ComputeMove(LP->gid, 0);
+            LP->gid = cell_compute_move(LP->gid, 0);
             ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
             current_event = tw_event_new(LP->gid, ts, LP);
-            new_message = (Msg_Data *) tw_event_data(current_event);
+            new_message = (message_data*) tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
             new_message->car.y_to_go = M->car.y_to_go;
             new_message->car.start_time = M->car.start_time;
