@@ -41,25 +41,37 @@
  * Maybe temporary until I figure out what is going on!
  */
 
+// VPs per PE?
 tw_lpid g_vp_per_proc = 0; // set in main
+
+// LPs per PE?
 tw_lpid g_cells_per_vp_x = MAP_WIDTH / NUM_VP_X;
 tw_lpid g_cells_per_vp_y = MAP_HEIGHT / NUM_VP_Y;
 tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
 
+// Average service time?
 tw_stime g_mean_service = 1.0;
+
+// QUESTION: lookahead?
 tw_stime g_lookahead = 1.0;
-static unsigned int g_stagger = 0;
-static unsigned int g_offset_lpid = 0;
+
+// QUESTION: mult?
+// Why are all these static?
 static tw_stime g_mult = 1.6;
-static tw_stime g_percent_remote = 0.25;
-static unsigned int g_ttl_lps = 0;
+
+// Number of LPs per PE
 static unsigned int g_nlp_per_pe = 8;
+
+// TODO: figure out what this means
 static int g_traffic_start_events = 15;
-static int g_optimistic_memory = 65536;
+
+// TODO: figure out what this means
+static int g_optimistic_memory = 65536; // 64 KB
 
 // rate for timestamp exponential distribution
 static tw_stime g_mean = 1.0;
 
+// Holds the total cars initiated and completed for statistics
 static unsigned long long g_total_cars = 0;
 static unsigned long long g_cars_finished = 0;
 

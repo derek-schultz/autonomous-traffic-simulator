@@ -46,7 +46,36 @@ int main(int argc, char* argv[]) {
     tw_opt_add(model_opts);
     tw_init(&argc, &argv);
 
+    if (g_lookahead > 1.0)
+        tw_error(TW_LOC, "Lookahead must be less than 1.0\n"); // QUESTION: why?
 
+    // Reset mean based on lookahead. QUESTION: why?
+    g_mean = g_mean - g_lookahead;
+
+    // QUESTION: this was 1 before...
+    g_tw_memory_nqueues = 16; // give at least 16 memory queue event
+
+    // Set lookahead
+    g_tw_lookahead = g_lookahead;
+
+    // TODO: clean this up?
+    g_nlp_per_pe = (MAP_WIDTH * MAP_HEIGHT) / (tw_nnodes() * g_tw_npe);
+    g_tw_events_per_pe = (g_mult * g_nlp_per_pe * g_traffic_start_events) + g_optimistic_memory;
+    num_cells_per_kp = (MAP_WIDTH * MAP_HEIGHT) / (NUM_VP_X * NUM_VP_Y);
+    vp_per_proc = (NUM_VP_X * NUM_VP_Y) / ((tw_nnodes() * g_tw_npe)) ;
+    g_vp_per_proc = vp_per_proc;
+    g_tw_nlp = g_nlp_per_pe;
+    g_tw_nkp = vp_per_proc;
+
+    g_tw_mapping = CUSTOM;
+    g_tw_custom_initial_mapping = &traffic_grid_mapping;
+    g_tw_custom_lp_global_to_local_map = &cell_mapping_to_lp;
+
+    tw_define_lps(g_nlp_per_pe, sizeof(message_data), 0);
+
+    int i;
+    for(i = 0; i < g_tw_nlp; i++)
+        tw_lp_settype(i, &traffic_lps[0]);
 
     tw_run();
     tw_end();
@@ -59,8 +88,8 @@ tw_peid cell_mapping_lp_to_pe(tw_lpid lpid) {
     long lp_y = lpid / MAP_WIDTH;
     long vp_num_x = lp_x / g_cells_per_vp_x;
     long vp_num_y = lp_y / g_cells_per_vp_y;
-    long vp_num = vp_num_x + (vp_num_y * NUM_VP_X);  
-    tw_peid peid = vp_num/g_vp_per_proc;  
+    long vp_num = vp_num_x + (vp_num_y * NUM_VP_X);
+    tw_peid peid = vp_num / g_vp_per_proc;
     return peid;
 }
 
@@ -92,7 +121,7 @@ tw_lpid cell_mapping_to_local_index(tw_lpid lpid) {
     tw_lpid vp_index = vp_index_x + (vp_index_y * (g_cells_per_vp_x));
     tw_lpid vp_num_x = lp_x/g_cells_per_vp_x;
     tw_lpid vp_num_y = lp_y/g_cells_per_vp_y;
-    tw_lpid vp_num = vp_num_x + (vp_num_y * NUM_VP_X);  
+    tw_lpid vp_num = vp_num_x + (vp_num_y * NUM_VP_X);
     vp_num = vp_num % g_vp_per_proc;
     tw_lpid index = vp_index + vp_num * g_cells_per_vp;
 
@@ -224,7 +253,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                         SV->north_lanes[0].light = SV->south_lanes[0].light = RED;
                         
                         int i;
-                        for(i = 1; i < SV->number_of_north_lanes; i++) {    
+                        for(i = 1; i < SV->number_of_north_lanes; i++) {
                             SV->north_lanes[i].light = GREEN;
                         } 
 
@@ -278,7 +307,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                     }
                 
                     // Change the East-West lanes to GREEN:
-                    for(i = 0; i < SV->number_of_east_lanes; i++) { 
+                    for(i = 0; i < SV->number_of_east_lanes; i++) {
                         SV->east_lanes[i].light = GREEN;
                     } 
 
@@ -392,7 +421,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				M->car.x_to_go--;
 				LP->gid = cell_compute_move(LP->gid, 1);
 			}
-			else if(M->var.x_to_go < 0) {
+			else if(M->car.x_to_go < 0) {
 				M->car.x_to_go++;
 				LP->gid = cell_compute_move(LP->gid, 0);
 			}
