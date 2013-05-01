@@ -78,7 +78,6 @@ typedef struct {
 	// Number of cars in this lane:
 	int number_of_cars;
 
-
 	// The traffic light color for this lane:
 	enum light_colors light;
 
@@ -113,6 +112,9 @@ typedef struct {
 	// Variable to hold the total time that this light waits:
 	int total_time;
 
+	// Variable to hold the total time for a left-turn arrow:
+	int left_total_time;
+
 	// Variable to hold the direction the lights are going:
 	enum directions traffic_direction;
 } intersection_state;
@@ -122,17 +124,16 @@ typedef struct {
 /**********************************FUNCTION PROTOTYPES************************/
 
 // Initialization of an intersection:
-void intersection_startup(intersection_state*, tw_lp*);
+void intersection_startup(intersection_state*, tw_LP*);
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_LP*);
 
 // Reverse event handler for an intersection:
-void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*,
-										tw_lp*);
+void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_LP*);
 
 // Function to collection statistics for an intersection:
-void intersection_statistics_collectstats(intersection_state*, tw_lp *);
+void intersection_statistics_collectstats(intersection_state*, tw_LP *);
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
@@ -165,22 +166,8 @@ const tw_optdef model_opts[] = {
     TWOPT_END(),
 };
 
-// Main Function:
-int main(int argc, char* argv[]) {
-
-    tw_init(&argc, &argv);
-
-
-
-    tw_run();
-    tw_end();
-
-    return 0;
-} /** END FUNCTION main **/
-
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state* SV, tw_bf* CV, 
-								message_data* M, tw_lp* LP) {
+void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_LP* LP) {
 
 	// Time warp starting time:
 	tw_stime ts = 0.0;
@@ -194,9 +181,18 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 	// Unknown time warp bit field:
 	*(int* ) CV = (int) 0;
 	
+	
+	// Subtract one from the remaining time until it is 0
+	
+	if(SV->time_remaining == 0)
+	{
+		M->event_type = LIGHT_CHANGE;
+	}
 	// Handle the events defined in the "events" enumeration:
 	switch(M->event_type) {
-
+			
+		SV->time_remaining--;
+			
 		// Handle the LIGHT_CHANGE event IF AND ONLY IF the time remaining on this intersection == 0:
 		case LIGHT_CHANGE:
 			
@@ -205,31 +201,197 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 			// Check if the traffic is permitted north-south (green on north and south lights):
 			if(SV->traffic_direction == NORTH_SOUTH) {
 				
-				// Change permitted direction to east-west (green on east and west lights):
-				SV->traffic_direction = EAST_WEST;
+				// Check if the left turning light is on (if any):
+				if(SV->has_green_arrow) {
+					// Check if this left-turn is GREEN:
+					if(SV->north_lanes[0].light == GREEN) {
+						// Turn the left-turn arrow to RED; turn on lanes to green:
+						SV->north_lanes[0].light = SV->south_lanes[0].light = RED;
+						
+						int i;
+						for(i = 1; i < number_of_north_lanes; i++) {	
+							SV->north_lanes[i].light = GREEN;
+						} 
 
-				// Turn off all the north and south lights to RED:
-				int i;
-				// North Lanes:
-				for(i = 0; i < SV->number_of_north_lanes; i++) {
-					SV->north_lanes[i].light = RED;
-				}
+						for(i = 1; i < number_of_south_lanes; i++) {
+							SV->south_lanes[i].light = GREEN;
+						}
+
+						// Set the remaining time to total time:
+						SV->time_remaining = SV->total_time;
+					} else {
+						// The left turn is RED; changing direction to EAST WEST:
+
+						// Change permitted direction to east-west (green on east and west lights):
+						SV->traffic_direction = EAST_WEST;
+
+						// Turn off all the north and south lights to RED:
+						int i;
+						// North Lanes:
+						for(i = 0; i < SV->number_of_north_lanes; i++) {
+							SV->north_lanes[i].light = RED;
+						}
 	
-				// South Lanes:
-				for(i = 0; i < SV->number_of_south_lanes; i++) {
-					SV->south_lanes[i].light = RED;
-				}
+						// South Lanes:
+						for(i = 0; i < SV->number_of_south_lanes; i++) {
+							SV->south_lanes[i].light = RED;
+						}
 
-				// Turn on all the east and west lanes to GREEN:
+						// Left-turning lanes exist:
+						SV->east_lanes[0].light = GREEN;
+						SV->west_lanes[0].light = GREEN;
+
+						// Set the left total time to the total time:
+						SV->time_remaining = SV->left_total_time;
+					} 
+				} else {
+					// This intersection does not have any green left arrows; just change direction:
+
+					// Change permitted direction to east-west (green on east and west lights):
+					SV->traffic_direction = EAST_WEST;
+
+					int i;
+
+					// North Lanes:
+					for(i = 0; i < SV->number_of_north_lanes; i++) {
+						SV->north_lanes[i].light = RED;
+					}
+	
+					// South Lanes:
+					for(i = 0; i < SV->number_of_south_lanes; i++) {
+						SV->south_lanes[i].light = RED;
+					}
 				
+					// Change the East-West lanes to GREEN:
+					for(i = 0; i < number_of_east_lanes; i++) {	
+						SV->east_lanes[i].light = GREEN;
+					} 
+
+					for(i = 1; i < number_of_west_lanes; i++) {
+						SV->west_lanes[i].light = GREEN;
+					}
+					SV->time_remaining = SV->total_time;
+				}
+			} else if(SV->traffic_direction == EAST_WEST) {
+				
+				// Check if the left turning light is on (if any):
+				if(SV->has_green_arrow) {
+					// Check if this left-turn is GREEN:
+					if(SV->east_lanes[0].light == GREEN) {
+						// Turn the left-turn arrow to RED; turn on lanes to green:
+						SV->east_lanes[0].light = SV->west_lanes[0].light = RED;
+						
+						int i;
+						for(i = 1; i < number_of_east_lanes; i++) {
+							SV->east_lanes[i].light = GREEN;
+						}
+						
+						for(i = 1; i < number_of_west_lanes; i++) {
+							SV->west_lanes[i].light = GREEN;
+						}
+						
+						// Set the remaining time to total time:
+						SV->time_remaining = SV->total_time;
+					} else {
+						// The left turn is RED; changing direction to NORTH SOUTH:
+						
+						// Change permitted direction to north-south (green on north and south lights):
+						SV->traffic_direction = NORTH_SOUTH;
+						
+						// Turn off all the north and south lights to RED:
+						int i;
+						// East Lanes:
+						for(i = 0; i < SV->number_of_esat_lanes; i++) {
+							SV->north_lanes[i].light = RED;
+						}
+						
+						// West Lanes:
+						for(i = 0; i < SV->number_of_west_lanes; i++) {
+							SV->south_lanes[i].light = RED;
+						}
+						
+						// Left-turning lanes exist:
+						SV->north_lanes[0].light = GREEN;
+						SV->south_lanes[0].light = GREEN;
+						
+						// Set the left total time to the total time:
+						SV->time_remaining = SV->left_total_time;
+					}
+				} else {
+					// This intersection does not have any green left arrows; just change direction:
+					
+					// Change permitted direction to north-south (green on north and south lights):
+					SV->traffic_direction = NORTH_SOUTH;
+					
+					int i;
+					
+					// East Lanes:
+					for(i = 0; i < SV->number_of_east_lanes; i++) {
+						SV->east_lanes[i].light = RED;
+					}
+					
+					// West Lanes:
+					for(i = 0; i < SV->number_of_west_lanes; i++) {
+						SV->west_lanes[i].light = RED;
+					}
+					
+					// Change the North-South lanes to GREEN:
+					for(i = 0; i < number_of_north_lanes; i++) {
+						SV->north_lanes[i].light = GREEN;
+					}
+					
+					for(i = 1; i < number_of_south_lanes; i++) {
+						SV->south_lanes[i].light = GREEN;
+					}
+					SV->time_remaining = SV->total_time;
+				}
 			}
 			
-			// Reset the time_remaining to the initial time:
-			time_remaining = total_time;
+			ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+			current_event = tw_event_new(LP->gid, ts, LP);
+			new_message = (Msg_Data *)tw_event_data(current_event);
+			new_message->car.x_to_go = M->car.x_to_go;
+			new_message->car.y_to_go = M->car.y_to_go;
+			new_message->car.start_time = M->car.start_time;
+			new_message->car.end_time = M->car.end_time;
+			// change event to a car arriving now that light has changed
+			new_message->event_type = CAR_ARRIVES;
+			//printf("send ari ");
+			tw_event_send(current_event);
+			
+			break;
+			
+		case CAR_ARRIVES:
+			
+			LP->gid = Cell_ComputeMove(LP->gid, 0);
+			ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+			current_event = tw_event_new(LP->gid, ts, LP);
+			new_message = (Msg_Data *) tw_event_data(current_event);
+			new_message->car.x_to_go = M->car.x_to_go;
+			new_message->car.y_to_go = M->car.y_to_go;
+			new_message->car.start_time = M->car.start_time;
+			new_message->car.end_time = M->car.end_time;
+			new_message->event_type = CAR_ARRIVES;
+			tw_event_send(current_event);
+			
 			break;
 
 	}
 } /** END FUNCTION intersection_eventhandler **/
+
+
+// Main Function:
+int main(int argc, char* argv[]) {
+
+    tw_init(&argc, &argv);
+
+
+
+    tw_run();
+    tw_end();
+
+    return 0;
+} /** END FUNCTION main **/
 
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid) {
     long lp_x = lpid % MAP_WIDTH;
