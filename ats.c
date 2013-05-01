@@ -579,8 +579,88 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
             } else if(SV->traffic_direction == EAST_WEST) {
                 // Traffic is moving EAST-WEST:
 
-                
+                // Check if East-West bound lanes have a left-turn arrow:
+                if(SV->has_green_arrow) {
+                    // Check if this left-turn is GREEN:
+                    if(SV-east_lanes[0].light == GREEN) {
+
+                        /*
+                         * This light is green; turn the left-turn arrow to RED
+                         * and turn on the NORTH-SOUTH lanes to GREEN:
+                         */
+                         SV->east_lanes[0].light = SV->west_lanes[0].light = RED;
+
+                         // Switch directions to NORTH-SOUTH:
+                         SV->traffic_direction = NORTH_SOUTH;
+
+                         // Turn on the NORTH-SOUTH lanes to GREEN:
+                         int i;
+
+                         for(i = 1; i < SV->numberof_north_lanes; i++) {
+                            SV->north_lanes[i].light = GREEN;
+                         }
+
+                         for(i = 1; i < SV->number_of_south_lanes; i++) {
+                            SV->south_lanes[i].light = GREEN;
+                         }
+
+                         // Reset the total time:
+                         SV->time_remaining = SV->total_time;
+                    } else {
+                        /*
+                         * The left turn is RED; turn off EAST-WEST straight lanes 
+                         * and turn on the EAST-WEST left turn arrows:
+                         */
+                         SV->east_lanes[0].light = SV->west_lanes[0].light = GREEN;
+
+                         int i;
+
+                         // East Lanes:
+                         for(i = 1; i < SV->number_of_east_lanes; i++) {
+                            SV->east_lanes[0].light = RED;
+                         }
+
+                         // West Lanes:
+                         for(i = 1; i < SV->number_of_west_lanes; i++) {
+                            SV->west_lanes[0].light = RED;
+                         }
+
+                         // Reset the total time left to the left total time:
+                         SV->time_remaining = SV->left_total_time;
+                    }
+                } else {
+                    /*
+                     * This intersection does not have any green left-arrows; just
+                     * change directions to NORTH-SOUTH and turn off all EAST-WEST lights:
+                     */
+                     SV->traffic_direction = NORTH_SOUTH;
+
+                     int i;
+
+                     // East and West Lanes:
+                     for(i = 0; i < SV->number_of_east_lanes; i++) {
+                        SV->east_lanes[i].light = RED;
+                     }
+                     for(i = 0; i < SV->number_of_west_lanes; i++) {
+                        SV->west_lanes[i].light = RED;
+                     }
+
+                     // Turn on all lights North and South:
+                     for(i = 0; i < SV->number_of_north_lanes; i++) {
+                        SV->north_lanes[i].light = GREEN;
+                     }
+                     for(i = 0; i < SV->number_of_south_lanes; i++) {
+                        SV->south_lanes[i].light = GREEN;
+                     }
+
+                     // Reset the total amount of time:
+                     SV->time_remaining = SV->total_time;
+                }
             }
+
+            // Reverse the event:
+            tw_rand_reverse_unif(lp->rng);
+            break;
     }
 
 } /** END FUNCTION intersection_reverse_eventhandler **/
