@@ -210,6 +210,28 @@ tw_lpid cell_compute_move(tw_lpid lpid, int direction)
     return dest_lpid;
 }
 
+void intersection_startup(intersection_state* SV, tw_lp* LP) {
+    tw_stime ts;
+    tw_event* current_event;
+    message_data* new_message;
+
+    int i;
+    for(i = 0; i < g_traffic_start_events; i++) {
+        // Arrival time
+        ts = tw_rand_exponential(LP->rng, g_mean_service);
+
+        current_event = tw_event_new(LP->gid, ts, LP);
+        new_message = (message_data*)tw_event_data(current_event);
+
+        new_message->event_type = CAR_ARRIVES;
+        new_message->car.x_to_go = rand() % 200 - 99; // TODO: what is this?
+        new_message->car.y_to_go = rand() % 200 - 99;
+        new_message->car.start_time = 0;
+
+        tw_event_send(current_event);
+    }
+}
+
 // Event handler for an intersection:
 void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
 

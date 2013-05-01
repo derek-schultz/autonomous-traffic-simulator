@@ -175,8 +175,6 @@ typedef struct {
 
 // Initialization of an intersection:
 void intersection_startup(intersection_state*, tw_lp*);
-// Temp
-void intersection_startup(intersection_state* s, tw_lp* l) { }
 
 // Event handler for an intersection:
 void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
