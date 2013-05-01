@@ -661,6 +661,9 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
             // Reverse the event:
             tw_rand_reverse_unif(lp->rng);
             break;
+
+        case CAR_ARRIVES:
+            // 
     }
 
 } /** END FUNCTION intersection_reverse_eventhandler **/
