@@ -1,16 +1,19 @@
 /*
- * ats.c - Autonomous Traffic Simulator - Parallel Programming Group Project
+ * ats.h - Autonomous Traffic Simulator - Parallel Programming Group Project
  * to simulate robotic cars in traffic conditions.
  *
  * Team Members:
- * Bryant Pong
  * Matt Hancock
+ * Bryant Pong
  * Derek Schultz
  *
  * CSCI-4320
- * 5/7/13
+ * 2013-05-07
  *
  */
+
+#ifndef _ATS_H_
+#define _ATS_H_
 
 // Include the ROSS Library:
 #include <ross.h>
@@ -35,7 +38,7 @@
 
 /*
  * GLOBALS AND CONSTANTS
- * Hopefully temporary until I figure out what is going on!
+ * Maybe temporary until I figure out what is going on!
  */
 
 tw_lpid g_vp_per_proc = 0; // set in main
@@ -43,23 +46,22 @@ tw_lpid g_cells_per_vp_x = MAP_WIDTH / NUM_VP_X;
 tw_lpid g_cells_per_vp_y = MAP_HEIGHT / NUM_VP_Y;
 tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
 
-tw_stime MEAN_SERVICE = 1.0;
-tw_stime lookahead = 1.0;
-static unsigned int stagger = 0;
-static unsigned int offset_lpid = 0;
-static tw_stime mult = 1.6;
-static tw_stime percent_remote = 0.25;
-static unsigned int ttl_lps = 0;
-static unsigned int nlp_per_pe = 8;
+tw_stime g_mean_service = 1.0;
+tw_stime g_lookahead = 1.0;
+static unsigned int g_stagger = 0;
+static unsigned int g_offset_lpid = 0;
+static tw_stime g_mult = 1.6;
+static tw_stime g_percent_remote = 0.25;
+static unsigned int g_ttl_lps = 0;
+static unsigned int g_nlp_per_pe = 8;
 static int g_traffic_start_events = 15;
-static int optimistic_memory = 65536;
+static int g_optimistic_memory = 65536;
 
 // rate for timestamp exponential distribution
-static tw_stime mean = 1.0;
+static tw_stime g_mean = 1.0;
 
-//static char run_id[1024] = "undefined";
-static unsigned long long totalCars = 0;
-static unsigned long long carsFinished = 0;
+static unsigned long long g_total_cars = 0;
+static unsigned long long g_cars_finished = 0;
 
 tw_lpid num_cells_per_kp = 0;
 tw_lpid vp_per_proc = 0;
@@ -185,3 +187,5 @@ void traffic_grid_mapping();
 tw_lpid cell_compute_move(tw_lpid lpid, int direction);
 
 /*******************************END FUNCTION PROTOTYPES***********************/
+
+#endif /* _ATS_H_ */

@@ -3,12 +3,12 @@
  * to simulate robotic cars in traffic conditions.
  *
  * Team Members:
- * Bryant Pong
  * Matt Hancock
+ * Bryant Pong
  * Derek Schultz
  *
  * CSCI-4320
- * 5/7/13
+ * 2013-05-07
  *
  */
 
@@ -109,8 +109,8 @@ void traffic_grid_mapping() {
     tw_lpid local_lp_count;
 
     num_cells_per_kp = (MAP_WIDTH * MAP_HEIGHT) / (NUM_VP_X * NUM_VP_Y);
-    vp_per_proc = (NUM_VP_X * NUM_VP_Y) / ((tw_nnodes() * g_tw_npe)) ;
-    g_tw_nlp = nlp_per_pe;
+    vp_per_proc = (NUM_VP_X * NUM_VP_Y) / ((tw_nnodes() * g_tw_npe));
+    g_tw_nlp = g_nlp_per_pe;
     g_tw_nkp = vp_per_proc;
 
     local_lp_count = 0;
@@ -362,7 +362,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                 }
             }
             
-            ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+            ts = tw_rand_exponential(LP->rng, g_mean_service);
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
@@ -379,7 +379,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
         case CAR_ARRIVES:
             
             LP->gid = cell_compute_move(LP->gid, 0);
-            ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+            ts = tw_rand_exponential(LP->rng, g_mean_service);
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*) tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
