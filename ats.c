@@ -663,9 +663,6 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
             break;
 
         case CAR_ARRIVES:
-<<<<<<< HEAD
-            // 
-=======
             // Handle the case when a car arrives:
 
             // Reverse follow the y path first:
@@ -690,7 +687,6 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
             tw_rand_reverse_unif(lp->rng);
 
             break;
->>>>>>> modifying-traffic-event-handler
     }
 
 } /** END FUNCTION intersection_reverse_eventhandler **/
