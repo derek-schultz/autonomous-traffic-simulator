@@ -124,16 +124,16 @@ typedef struct {
 /**********************************FUNCTION PROTOTYPES************************/
 
 // Initialization of an intersection:
-void intersection_startup(intersection_state*, tw_LP*);
+void intersection_startup(intersection_state*, tw_lp*);
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_LP*);
+void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 
 // Reverse event handler for an intersection:
-void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_LP*);
+void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 
 // Function to collection statistics for an intersection:
-void intersection_statistics_collectstats(intersection_state*, tw_LP *);
+void intersection_statistics_collectstats(intersection_state*, tw_lp*);
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
@@ -263,7 +263,7 @@ void traffic_grid_mapping() {
 }
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_LP* LP) {
+void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
 
     // Time warp starting time:
     tw_stime ts = 0.0;
