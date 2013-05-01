@@ -663,7 +663,34 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
             break;
 
         case CAR_ARRIVES:
+<<<<<<< HEAD
             // 
+=======
+            // Handle the case when a car arrives:
+
+            // Reverse follow the y path first:
+            if(M->car.y_to_go > 0) {
+                M->car.y_to_go++;
+                LP->gid = cell_compute_move(LP->gid, SOUTH);
+            } else if(M->car.y_to_go < 0) {
+                M->car.y_to_go--;
+                LP->gid = cell_compute_move(LP->gid, NORTH);
+            }
+
+            // Reverse once y is 0, follows x path:
+            else if(M->car.x_to_go > 0) {
+                M->car.x_to_go++;
+                LP->gid = cell_compute_move(LP->gid, WEST);
+            } else if(M->car.x_to_go < 0) {
+                M->car.x_to_go--;
+                LP->gid = cell_compute_move(LP->gid, EAST);
+            }
+
+            // Reverse the event:
+            tw_rand_reverse_unif(lp->rng);
+
+            break;
+>>>>>>> modifying-traffic-event-handler
     }
 
 } /** END FUNCTION intersection_reverse_eventhandler **/
