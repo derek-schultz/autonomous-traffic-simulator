@@ -156,6 +156,28 @@ tw_lptype mylps[] = {
     { 0 },
 };
 
+//Command Line Arguments
+extern unsigned int autonomous;
+
+const tw_optdef model_opts[] = {
+    TWOPT_GROUP("Traffic Model"),
+    TWOPT_UINT("autonomous", autonomous, "1 for autonomous vehicles, 0 for traditional intersections"),
+    TWOPT_END(),
+};
+
+// Main Function:
+int main(int argc, char* argv[]) {
+
+    tw_init(&argc, &argv);
+
+
+
+    tw_run();
+    tw_end();
+
+    return 0;
+} /** END FUNCTION main **/
+
 // Event handler for an intersection:
 void intersection_eventhandler(intersection_state* SV, tw_bf* CV, 
 								message_data* M, tw_lp* LP) {
@@ -208,12 +230,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 
 	}
 } /** END FUNCTION intersection_eventhandler **/
-
-// Main Function:
-int main(int argc, char* argv[]) {
-
-	return 0;
-} /** END FUNCTION main **/
 
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid) {
     long lp_x = lpid % MAP_WIDTH;
