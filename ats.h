@@ -92,7 +92,8 @@ enum events { LIGHT_CHANGE, CAR_ARRIVES };
 enum light_colors { RED, GREEN };
 
 // Directions to determine which way traffic is permitted in an intersection:
-enum directions { NORTH_SOUTH, EAST_WEST };
+enum intersection_directions { NORTH_SOUTH, EAST_WEST };
+enum cardinal_directions { WEST, EAST, SOUTH, NORTH };
 
 /**************************************** END ENUMS BLOCK ********************/
 
@@ -166,7 +167,7 @@ typedef struct {
     int left_total_time;
 
     // Variable to hold the direction the lights are going:
-    enum directions traffic_direction;
+    enum intersection_directions traffic_direction;
 } intersection_state;
 
 /** END STRUCTS BLOCK **/

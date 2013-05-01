@@ -177,25 +177,25 @@ tw_lpid cell_compute_move(tw_lpid lpid, int direction)
 
     switch(direction)
     {
-    case 0:
+    case WEST:
         // X-going west
         n_x = ((lpid_x - 1) + MAP_WIDTH) % MAP_WIDTH;
         n_y = lpid_y;
         break;
 
-    case 1:
+    case EAST:
         // X-going east
         n_x = (lpid_x + 1) % MAP_WIDTH;
         n_y = lpid_y;
         break;
 
-    case 2:
+    case SOUTH:
         // Y-going south
         n_x = lpid_x;
         n_y = ((lpid_y - 1) + MAP_HEIGHT) % MAP_HEIGHT;
         break;
 
-    case 3:
+    case NORTH:
         // Y-going north
         n_x = lpid_x;
         n_y = (lpid_y + 1) % MAP_HEIGHT;
@@ -432,20 +432,20 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			// follows the y path first
 			if(M->car.y_to_go > 0) {
 				M->car.y_to_go--;
-				LP->gid = cell_compute_move(LP->gid, 3);
+				LP->gid = cell_compute_move(LP->gid, NORTH);
 			}
 			else if(M->car.y_to_go < 0) {
 				M->car.y_to_go++;
-				LP->gid = cell_compute_move(LP->gid, 2);
+				LP->gid = cell_compute_move(LP->gid, SOUTH);
 			}
 			// once y is 0, follows x path
 			else if(M->car.x_to_go > 0) {
 				M->car.x_to_go--;
-				LP->gid = cell_compute_move(LP->gid, 1);
+				LP->gid = cell_compute_move(LP->gid, EAST);
 			}
 			else if(M->car.x_to_go < 0) {
 				M->car.x_to_go++;
-				LP->gid = cell_compute_move(LP->gid, 0);
+				LP->gid = cell_compute_move(LP->gid, WEST);
 			}
 
             ts = tw_rand_exponential(LP->rng, g_mean_service);
