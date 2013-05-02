@@ -226,7 +226,7 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
         new_message->event_type = CAR_ARRIVES;
         new_message->car.x_to_go = rand() % 200 - 99; // TODO: what is this?
         new_message->car.y_to_go = rand() % 200 - 99;
-        new_message->car.start_time = 0;
+        new_message->car.start_time = tw_clock_now(LP->pe);
 
         tw_event_send(current_event);
     }
@@ -429,6 +429,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             
         case CAR_ARRIVES:
             
+			SV->total_cars_arrived++;
 			// follows the y path first
 			if(M->car.y_to_go > 0) {
 				M->car.y_to_go--;
@@ -446,6 +447,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			else if(M->car.x_to_go < 0) {
 				M->car.x_to_go++;
 				LP->gid = cell_compute_move(LP->gid, WEST);
+			}
+			else {
+				M->car.end_time = tw_clock_now(LP->pe);
+				SV->total_cars_finished++;
+				break;
 			}
 
             ts = tw_rand_exponential(LP->rng, g_mean_service);
@@ -664,7 +670,8 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 
         case CAR_ARRIVES:
             // Handle the case when a car arrives:
-
+			
+			SV->total_cars_arrived--;
             // Reverse follow the y path first:
             if(M->car.y_to_go > 0) {
                 M->car.y_to_go++;
@@ -682,7 +689,12 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
                 M->car.x_to_go--;
                 LP->gid = cell_compute_move(LP->gid, EAST);
             }
-
+			else {
+				M->car.end_time = tw_clock_now(LP->pe);
+				SV->total_cars_finished--;
+				break;
+			}
+			
             // Reverse the event:
             tw_rand_reverse_unif(lp->rng);
 
