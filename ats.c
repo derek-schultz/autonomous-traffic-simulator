@@ -80,6 +80,8 @@ int main(int argc, char* argv[]) {
     tw_run();
     tw_end();
 
+	
+	
     return 0;
 } /** END FUNCTION main **/
 
@@ -229,7 +231,8 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
 		new_message->car.x_to_go_original = new_message->car.x_to_go;
 		new_message->car.y_to_go_original = new_message->car.y_to_go;
         new_message->car.start_time = tw_clock_now(LP->pe);
-
+		new_message->car.has_turned_yet = 0;
+		
         tw_event_send(current_event);
     }
 }
@@ -415,6 +418,18 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                 }
             }
             
+			int i;
+			for(i=0; i<SV->time_remaining; i++) {
+				
+			}
+			
+			
+			
+			
+			
+			
+			
+			
             ts = tw_rand_exponential(LP->rng, g_mean_service);
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
@@ -422,6 +437,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             new_message->car.y_to_go = M->car.y_to_go;
             new_message->car.start_time = M->car.start_time;
             new_message->car.end_time = M->car.end_time;
+			new_message->car.has_turned_yet = M->car.has_turned_yet;
             // change event to a car arriving now that light has changed
             new_message->event_type = CAR_ARRIVES;
             //printf("send ari ");
@@ -433,24 +449,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             
 			SV->total_cars_arrived++;
 			// follows the y path first
-			if(M->car.y_to_go > 0) {
-				M->car.y_to_go--;
-				LP->gid = cell_compute_move(LP->gid, NORTH);
-			}
-			else if(M->car.y_to_go < 0) {
-				M->car.y_to_go++;
-				LP->gid = cell_compute_move(LP->gid, SOUTH);
-			}
-			// once y is 0, follows x path
-			else if(M->car.x_to_go > 0) {
-				M->car.x_to_go--;
-				LP->gid = cell_compute_move(LP->gid, EAST);
-			}
-			else if(M->car.x_to_go < 0) {
-				M->car.x_to_go++;
-				LP->gid = cell_compute_move(LP->gid, WEST);
-			}
-			else {
+			if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {
 				M->car.end_time = tw_clock_now(LP->pe);
 				SV->total_cars_finished++;
 				g_total_time += (M->car.end_time - M->car.start_time);
@@ -458,17 +457,41 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					   M->car.y_to_go_original, (M->car.end_time - M->car.start_time));
 				break;
 			}
-
-            ts = tw_rand_exponential(LP->rng, g_mean_service);
-            current_event = tw_event_new(LP->gid, ts, LP);
-            new_message = (message_data*) tw_event_data(current_event);
-            new_message->car.x_to_go = M->car.x_to_go;
-            new_message->car.y_to_go = M->car.y_to_go;
-            new_message->car.start_time = M->car.start_time;
-            new_message->car.end_time = M->car.end_time;
-            new_message->event_type = CAR_ARRIVES;
-            tw_event_send(current_event);
-            
+			if(M->car.y_to_go > 0) {
+				SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
+				SV->south_lanes[1].number_of_cars++;
+				//M->car.y_to_go--;
+				//LP->gid = cell_compute_move(LP->gid, NORTH);
+			}
+			else if(M->car.y_to_go < 0) {
+				SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
+				SV->north_lanes[1].number_of_cars++;
+				//M->car.y_to_go++;
+				//LP->gid = cell_compute_move(LP->gid, SOUTH);
+			}
+			else if(M->car.y_to_go == 0) {
+				if(M->car.has_turned_yet) {
+					if(M->car.x_to_go > 0) {
+						SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
+						SV->west_lanes[1].number_of_cars++;
+					}
+					else if(M->car.x_to_go < 0) {
+						SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
+						SV->east_lanes[1].number_of_cars++;
+					}
+				}
+				else if(M->car.y_to_go_original > 0) {
+					M->car.has_turned_yet = 1;
+					SV->south_lanes[2].cars[SV->south_lanes[2].number_of_cars] = M->car;
+					SV->south_lanes[2].number_of_cars++;
+				}
+				else if(M->car.y_to_go_original < 0) {
+					M->car.has_turned_yet = 1;
+					SV->north_lanes[0].cars[SV->north_lanes[0].number_of_cars] = M->car;
+					SV->north_lanes[0].number_of_cars++;
+				}
+				
+			}
             break;
 
     }

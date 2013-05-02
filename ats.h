@@ -113,8 +113,9 @@ typedef struct {
 	
 	int x_to_go_original;
     int y_to_go_original;
-    // Enumeration to hold the current direction:
-    //enum directions current_direction;
+    
+	int has_turned_yet;
+	
 } car_type;
 
 // Message repesentation:
