@@ -702,3 +702,8 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
     }
 
 } /** END FUNCTION intersection_reverse_eventhandler **/
+
+void intersection_statistics_collectstats(intersection_state* SV, tw_lp* LP) {
+	g_total_cars += SV->total_cars_arrived;
+	g_cars_finished += SV->total_cars_finished;
+}
