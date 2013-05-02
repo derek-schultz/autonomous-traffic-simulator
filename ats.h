@@ -116,6 +116,9 @@ typedef struct {
     
 	int has_turned_yet;
 	
+	// Variable to hold the next intersection:
+	tw_lpid next_intersection;
+
 } car_type;
 
 // Message repesentation:

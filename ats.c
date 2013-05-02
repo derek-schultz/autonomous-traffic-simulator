@@ -262,7 +262,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
     // Handle the events defined in the "events" enumeration:
     switch(M->event_type) {
             
-        SV->time_remaining--;
+        //SV->time_remaining--;
             
         // Handle the LIGHT_CHANGE event IF AND ONLY IF the time remaining on this intersection == 0:
         case LIGHT_CHANGE:
@@ -418,18 +418,56 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                 }
             }
             
+			/*
 			int i;
 			for(i=0; i<SV->time_remaining; i++) {
 				
+			}*/
+
+			// If the traffic direction is NORTH-SOUTH:
+			if(SV->traffic_direction == NORTH_SOUTH) {
+				
+				// Check if the NORTH-SOUTH direction has an arrow:
+				if(SV->has_green_arrow) {
+					
+					// Check if the NORTH-SOUTH left turns are green:
+					if(SV->north_lanes[0].light == GREEN) {
+						
+						// Only select cars from the left lane in the NORTH-SOUTH:
+						int i;
+						int numberOfCarsDeployed = 0;
+
+						// North lane - RELEASE ALL 30 CARS:
+						for(i = 0; i < 30; i++) {
+							
+							// If we hit the number of cars in this lane, break:
+							if(i >= SV->north_lanes[0].number_of_cars) {
+								break;
+							}
+
+							// Schedule a CAR_ARRIVES event for each car's next intersection:
+							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							current_event = tw_event_new(SV->north_lanes[0].cars[i].next_intersection, ts, LP);
+							new_message = (message_data*) tw_event_data(current_event);
+							new_message->car.x_to_go = M->car.x_to_go;
+            				new_message->car.y_to_go = M->car.y_to_go;
+            				new_message->car.start_time = M->car.start_time;
+            				new_message->car.end_time = M->car.end_time;
+							new_message->car.has_turned_yet = M->car.has_turned_yet;
+            				// change event to a car arriving now that light has changed
+            				new_message->event_type = CAR_ARRIVES;
+            				tw_event_send(current_event);
+
+							numberOfCarsDeployed++;
+						} 
+
+						// Decrement the number of cars in the lane:
+						SV->north_lanes[0].number_of_cars -= numberOfCarsDeployed;
+					}
+				}
 			}
 			
-			
-			
-			
-			
-			
-			
-			
+			// WRONG!!!!
             ts = tw_rand_exponential(LP->rng, g_mean_service);
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
@@ -442,7 +480,8 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             new_message->event_type = CAR_ARRIVES;
             //printf("send ari ");
             tw_event_send(current_event);
-            
+            // END WRONG
+
             break;
             
         case CAR_ARRIVES:
@@ -462,33 +501,51 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				SV->south_lanes[1].number_of_cars++;
 				//M->car.y_to_go--;
 				//LP->gid = cell_compute_move(LP->gid, NORTH);
+				
+				// Calculate the next intersection in the NORTH direction:
+				M->car.next_intersection = cell_compute_move(LP->gid, NORTH);
 			}
 			else if(M->car.y_to_go < 0) {
 				SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
 				SV->north_lanes[1].number_of_cars++;
 				//M->car.y_to_go++;
 				//LP->gid = cell_compute_move(LP->gid, SOUTH);
+
+				// Calculate the next intersection in the SOUTH direction:
+				M->car.next_intersection = cell_compute_move(LP->gid, SOUTH);
 			}
 			else if(M->car.y_to_go == 0) {
 				if(M->car.has_turned_yet) {
 					if(M->car.x_to_go > 0) {
 						SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
 						SV->west_lanes[1].number_of_cars++;
+
+						// Calculate the next intersection in the EAST direction:
+						M->car.next_intersection = cell_compute_move(LP->gid, EAST);
 					}
 					else if(M->car.x_to_go < 0) {
 						SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
 						SV->east_lanes[1].number_of_cars++;
+					
+						// Calculate the next intersection in the WEST direction:
+						M->car.next_intersection = cell_compute_move(LP->gid, WEST);
 					}
 				}
 				else if(M->car.y_to_go_original > 0) {
 					M->car.has_turned_yet = 1;
 					SV->south_lanes[2].cars[SV->south_lanes[2].number_of_cars] = M->car;
 					SV->south_lanes[2].number_of_cars++;
+
+					// Calculate the next intersection in the NORTH direction:
+					M->car.next_intersection = cell_compute_move(LP->gid, NORTH);
 				}
 				else if(M->car.y_to_go_original < 0) {
 					M->car.has_turned_yet = 1;
 					SV->north_lanes[0].cars[SV->north_lanes[0].number_of_cars] = M->car;
 					SV->north_lanes[0].number_of_cars++;
+
+					// Calculate the next intersection in the SOUTH direction:
+					M->car.next_intersection = cell_compute_move(LP->gid, SOUTH);
 				}
 				
 			}
