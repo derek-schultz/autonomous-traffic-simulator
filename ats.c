@@ -522,7 +522,7 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
                          SV->traffic_direction = EAST_WEST;
                          
                          // Reset the traffic light timer:
-                         SV->time_remaining = SV->total_time 
+						SV->time_remaining = SV->total_time;
                     } else {
                         /*
                          * The left turn is RED; turn off the NORTH-SOUTH straight lights
@@ -593,7 +593,7 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
                 // Check if East-West bound lanes have a left-turn arrow:
                 if(SV->has_green_arrow) {
                     // Check if this left-turn is GREEN:
-                    if(SV-east_lanes[0].light == GREEN) {
+                    if(SV->east_lanes[0].light == GREEN) {
 
                         /*
                          * This light is green; turn the left-turn arrow to RED
@@ -607,7 +607,7 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
                          // Turn on the NORTH-SOUTH lanes to GREEN:
                          int i;
 
-                         for(i = 1; i < SV->numberof_north_lanes; i++) {
+                         for(i = 1; i < SV->number_of_north_lanes; i++) {
                             SV->north_lanes[i].light = GREEN;
                          }
 
@@ -670,7 +670,7 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
             }
 
             // Reverse the event:
-            tw_rand_reverse_unif(lp->rng);
+            tw_rand_reverse_unif(LP->rng);
             break;
 
         case CAR_ARRIVES:
@@ -701,7 +701,7 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 			}
 			
             // Reverse the event:
-            tw_rand_reverse_unif(lp->rng);
+            tw_rand_reverse_unif(LP->rng);
 
             break;
     }

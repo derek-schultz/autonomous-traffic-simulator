@@ -188,12 +188,12 @@ void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp
 // Reverse event handler for an intersection:
 void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 // Temp
-void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
+//void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
 
 // Function to collection statistics for an intersection:
 void intersection_statistics_collectstats(intersection_state*, tw_lp*);
 // Temp
-void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
+//void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
