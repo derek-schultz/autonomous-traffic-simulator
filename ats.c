@@ -226,6 +226,8 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
         new_message->event_type = CAR_ARRIVES;
         new_message->car.x_to_go = rand() % 200 - 99; // TODO: what is this?
         new_message->car.y_to_go = rand() % 200 - 99;
+		new_message->car.x_to_go_original = new_message->car.x_to_go;
+		new_message->car.y_to_go_original = new_message->car.y_to_go;
         new_message->car.start_time = tw_clock_now(LP->pe);
 
         tw_event_send(current_event);
@@ -451,6 +453,9 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			else {
 				M->car.end_time = tw_clock_now(LP->pe);
 				SV->total_cars_finished++;
+				g_total_time += (M->car.end_time - M->car.start_time);
+				printf("Car finished with x: %d and y:%d with time: %d\n", M->car.x_to_go_original,
+					   M->car.y_to_go_original, (M->car.end_time - M->car.start_time));
 				break;
 			}
 
@@ -706,4 +711,5 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 void intersection_statistics_collectstats(intersection_state* SV, tw_lp* LP) {
 	g_total_cars += SV->total_cars_arrived;
 	g_cars_finished += SV->total_cars_finished;
+	g_average_time = g_total_time/g_cars_finished;
 }

@@ -74,6 +74,8 @@ static tw_stime g_mean = 1.0;
 // Holds the total cars initiated and completed for statistics
 static unsigned long long g_total_cars = 0;
 static unsigned long long g_cars_finished = 0;
+static unsigned long long g_total_time = 0;
+static unsigned long long g_average_time = 0;
 
 tw_lpid num_cells_per_kp = 0;
 tw_lpid vp_per_proc = 0;
@@ -108,6 +110,9 @@ typedef struct {
     // Variables to hold the destination's X and Y coordinates:
     int x_to_go;
     int y_to_go;
+	
+	int x_to_go_original;
+    int y_to_go_original;
     // Enumeration to hold the current direction:
     //enum directions current_direction;
 } car_type;
