@@ -164,7 +164,7 @@ typedef struct {
     int number_of_east_lanes;
     
     // Describes whether a direction will get a green arrow:
-    int has_green_arrow;
+    int has_turning_arrow;
 
     // Variable to hold the time remaining on the intersection:
     int time_remaining;
