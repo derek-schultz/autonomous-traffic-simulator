@@ -424,14 +424,14 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						/****************************/
 						/***** MOVING LEFT CARS *****/
-						/***** **********************/
+						/****************************/
 						
 						// Only select cars from the left lane in the NORTH-SOUTH:
 						int i;
 						int number_of_cars_north_left_deployed = 0;
 						int number_of_cars_south_left_deployed = 0;
 
-						// North lane - release crs based on time remaining
+						// North lane - release cars based on time remaining
 						for(i = 0; i < SV->time_remaining; i++) {
 							
 							// If we hit the number of cars in this lane, break:
@@ -471,19 +471,19 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							}
 						}
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_north_left_deployed; i++) {
 							SV->north_lanes[0].cars[i] = SV->north_lanes[0].cars[i+number_of_cars_north_left_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->north_lanes[0].number_of_cars -= number_of_cars_north_left_deployed;
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_south_left_deployed; i++) {
-							SV->north_lanes[0].cars[i] = SV->north_lanes[0].cars[i+number_of_cars_south_left_deployed];
+							SV->south_lanes[0].cars[i] = SV->south_lanes[0].cars[i+number_of_cars_south_left_deployed];
 						}
 						// Decrement the number of cars in the lane:
-						SV->north_lanes[0].number_of_cars -= number_of_cars_south_left_deployed;
+						SV->south_lanes[0].number_of_cars -= number_of_cars_south_left_deployed;
 					} else {
 						
 						/**************************************/
@@ -569,28 +569,28 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							}
 						}
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_north_center_deployed; i++) {
 							SV->north_lanes[1].cars[i] = SV->north_lanes[1].cars[i+number_of_cars_north_center_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->north_lanes[1].number_of_cars -= number_of_cars_north_center_deployed;
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_north_right_deployed; i++) {
 							SV->north_lanes[2].cars[i] = SV->north_lanes[2].cars[i+number_of_cars_north_right_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->north_lanes[2].number_of_cars -= number_of_cars_north_right_deployed;
 
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_south_center_deployed; i++) {
 							SV->south_lanes[1].cars[i] = SV->south_lanes[1].cars[i+number_of_cars_south_center_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->south_lanes[1].number_of_cars -= number_of_cars_south_center_deployed;
 
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_south_right_deployed; i++) {
 							SV->south_lanes[2].cars[i] = SV->south_lanes[2].cars[i+number_of_cars_south_right_deployed];
 						}
@@ -681,28 +681,28 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						}
 					}
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_north_center_deployed; i++) {
 						SV->north_lanes[0].cars[i] = SV->north_lanes[0].cars[i+number_of_cars_north_center_deployed];
 					}
 					// Decrement the number of cars in the lane:
 					SV->north_lanes[0].number_of_cars -= number_of_cars_north_center_deployed;
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_north_right_deployed; i++) {
 						SV->north_lanes[1].cars[i] = SV->north_lanes[1].cars[i+number_of_cars_north_right_deployed];
 					}
 					// Decrement the number of cars in the lane:
 					SV->north_lanes[1].number_of_cars -= number_of_cars_north_right_deployed;
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_south_center_deployed; i++) {
 						SV->south_lanes[0].cars[i] = SV->south_lanes[0].cars[i+number_of_cars_south_center_deployed];
 					}
 					// Decrement the number of cars in the lane:
 					SV->south_lanes[0].number_of_cars -= number_of_cars_south_center_deployed;
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_south_right_deployed; i++) {
 						SV->south_lanes[1].cars[i] = SV->south_lanes[1].cars[i+number_of_cars_south_right_deployed];
 					}
@@ -726,7 +726,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						int number_of_cars_east_left_deployed = 0;
 						int number_of_cars_west_left_deployed = 0;
 						
-						// North lane - release crs based on time remaining
+						// North lane - release cars based on time remaining
 						for(i = 0; i < SV->time_remaining; i++) {
 							
 							// If we hit the number of cars in this lane, break:
@@ -766,14 +766,14 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							}
 						}
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_east_left_deployed; i++) {
 							SV->east_lanes[0].cars[i] = SV->east_lanes[0].cars[i+number_of_cars_east_left_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->east_lanes[0].number_of_cars -= number_of_cars_east_left_deployed;
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_west_left_deployed; i++) {
 							SV->west_lanes[0].cars[i] = SV->west_lanes[0].cars[i+number_of_cars_west_left_deployed];
 						}
@@ -864,28 +864,28 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							}
 						}
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_east_center_deployed; i++) {
 							SV->east_lanes[1].cars[i] = SV->east_lanes[1].cars[i+number_of_cars_east_center_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->east_lanes[1].number_of_cars -= number_of_cars_east_center_deployed;
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_east_right_deployed; i++) {
 							SV->east_lanes[2].cars[i] = SV->east_lanes[2].cars[i+number_of_cars_east_right_deployed];
 						}
 						// Decrement the number of cars in the lane:
-						SV->north_lanes[2].number_of_cars -= number_of_cars_east_right_deployed;
+						SV->east_lanes[2].number_of_cars -= number_of_cars_east_right_deployed;
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_west_center_deployed; i++) {
 							SV->west_lanes[1].cars[i] = SV->west_lanes[1].cars[i+number_of_cars_west_center_deployed];
 						}
 						// Decrement the number of cars in the lane:
 						SV->west_lanes[1].number_of_cars -= number_of_cars_west_center_deployed;
 						
-						// move crs up in the array
+						// move cars up in the array
 						for(i=0; i<number_of_cars_west_right_deployed; i++) {
 							SV->west_lanes[2].cars[i] = SV->west_lanes[2].cars[i+number_of_cars_west_right_deployed];
 						}
@@ -976,28 +976,28 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						}
 					}
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_east_center_deployed; i++) {
 						SV->east_lanes[0].cars[i] = SV->east_lanes[0].cars[i+number_of_cars_east_center_deployed];
 					}
 					// Decrement the number of cars in the lane:
 					SV->east_lanes[0].number_of_cars -= number_of_cars_east_center_deployed;
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_east_right_deployed; i++) {
 						SV->east_lanes[1].cars[i] = SV->east_lanes[1].cars[i+number_of_cars_east_right_deployed];
 					}
 					// Decrement the number of cars in the lane:
 					SV->east_lanes[1].number_of_cars -= number_of_cars_east_right_deployed;
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_west_center_deployed; i++) {
 						SV->west_lanes[0].cars[i] = SV->west_lanes[0].cars[i+number_of_cars_west_center_deployed];
 					}
 					// Decrement the number of cars in the lane:
 					SV->west_lanes[0].number_of_cars -= number_of_cars_west_center_deployed;
 					
-					// move crs up in the array
+					// move cars up in the array
 					for(i=0; i<number_of_cars_west_right_deployed; i++) {
 						SV->west_lanes[1].cars[i] = SV->west_lanes[1].cars[i+number_of_cars_west_right_deployed];
 					}
