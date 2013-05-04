@@ -234,7 +234,7 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
 	SV->total_cars_finished = 0;
 
 	// Initialize total_time and remaining_time:
-	SV->total_time = remaining_time = 10;
+	SV->total_time = SV->time_remaining = 10;
 	
     int i;
     for(i = 0; i < g_traffic_start_events; i++) {
@@ -283,770 +283,17 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             if(SV->traffic_direction == NORTH_SOUTH) {
                 
 				// Switch permitted traffic to EAST_WEST:
-				SV->traffic_direction == EAST_WEST;
+				SV->traffic_direction = EAST_WEST;
 			} else {
 
 				// Traffic was permitted east-west; switch permitted traffic to NORTH_SOUTH:
-				SV->traffic_direction == NORTH_SOUTH;
+				SV->traffic_direction = NORTH_SOUTH;
 			}
 
 			// Reset the total time on the light to the original time:
 			SV->time_remaining = SV->total_time;
 			break;
-
-				/*
-                // Check if the left turning light is on (if any):
-                if(SV->has_turning_arrow) {
-                    // Check if this left-turn is GREEN:
-                    if(SV->north_lanes[0].light == GREEN) {
-                        // Turn the left-turn arrow to RED; turn on lanes to green:
-                        SV->north_lanes[0].light = SV->south_lanes[0].light = RED;
-                        
-                        int i;
-                        for(i = 1; i < SV->number_of_north_lanes; i++) {
-                            SV->north_lanes[i].light = GREEN;
-                        } 
-
-                        for(i = 1; i < SV->number_of_south_lanes; i++) {
-                            SV->south_lanes[i].light = GREEN;
-                        }
-
-                        // Set the remaining time to total time:
-                        SV->time_remaining = SV->total_time;
-                    } else {
-                        // The left turn is RED; changing direction to EAST WEST:
-
-                        // Change permitted direction to east-west (green on east and west lights):
-                        SV->traffic_direction = EAST_WEST;
-
-                        // Turn off all the north and south lights to RED:
-                        int i;
-                        // North Lanes:
-                        for(i = 0; i < SV->number_of_north_lanes; i++) {
-                            SV->north_lanes[i].light = RED;
-                        }
-    
-                        // South Lanes:
-                        for(i = 0; i < SV->number_of_south_lanes; i++) {
-                            SV->south_lanes[i].light = RED;
-                        }
-
-                        // Left-turning lanes exist:
-                        SV->east_lanes[0].light = GREEN;
-                        SV->west_lanes[0].light = GREEN;
-
-                        // Set the left total time to the total time:
-                        SV->time_remaining = SV->left_total_time;
-                    } 
-                } else {
-                    // This intersection does not have any green left arrows; just change direction:
-
-                    // Change permitted direction to east-west (green on east and west lights):
-                    SV->traffic_direction = EAST_WEST;
-
-                    int i;
-
-                    // North Lanes:
-                    for(i = 0; i < SV->number_of_north_lanes; i++) {
-                        SV->north_lanes[i].light = RED;
-                    }
-    
-                    // South Lanes:
-                    for(i = 0; i < SV->number_of_south_lanes; i++) {
-                        SV->south_lanes[i].light = RED;
-                    }
-                
-                    // Change the East-West lanes to GREEN:
-                    for(i = 0; i < SV->number_of_east_lanes; i++) {
-                        SV->east_lanes[i].light = GREEN;
-                    } 
-
-                    for(i = 0; i < SV->number_of_west_lanes; i++) {
-                        SV->west_lanes[i].light = GREEN;
-                    }
-                    SV->time_remaining = SV->total_time;
-                }
-            } else if(SV->traffic_direction == EAST_WEST) {
-                
-                // Check if the left turning light is on (if any):
-                if(SV->has_turning_arrow) {
-                    // Check if this left-turn is GREEN:
-                    if(SV->east_lanes[0].light == GREEN) {
-                        // Turn the left-turn arrow to RED; turn on lanes to green:
-                        SV->east_lanes[0].light = SV->west_lanes[0].light = RED;
-                        
-                        int i;
-                        for(i = 1; i < SV->number_of_east_lanes; i++) {
-                            SV->east_lanes[i].light = GREEN;
-                        }
-                        
-                        for(i = 1; i < SV->number_of_west_lanes; i++) {
-                            SV->west_lanes[i].light = GREEN;
-                        }
-                        
-                        // Set the remaining time to total time:
-                        SV->time_remaining = SV->total_time;
-                    } else {
-                        // The left turn is RED; changing direction to NORTH SOUTH:
-                        
-                        // Change permitted direction to north-south (green on north and south lights):
-                        SV->traffic_direction = NORTH_SOUTH;
-                        
-                        // Turn off all the north and south lights to RED:
-                        int i;
-                        // East Lanes:
-                        for(i = 0; i < SV->number_of_east_lanes; i++) {
-                            SV->north_lanes[i].light = RED;
-                        }
-                        
-                        // West Lanes:
-                        for(i = 0; i < SV->number_of_west_lanes; i++) {
-                            SV->south_lanes[i].light = RED;
-                        }
-                        
-                        // Left-turning lanes exist:
-                        SV->north_lanes[0].light = GREEN;
-                        SV->south_lanes[0].light = GREEN;
-                        
-                        // Set the left total time to the total time:
-                        SV->time_remaining = SV->left_total_time;
-                    }
-                } else {
-                    // This intersection does not have any green left arrows; just change direction:
-                    
-                    // Change permitted direction to north-south (green on north and south lights):
-                    SV->traffic_direction = NORTH_SOUTH;
-                    
-                    int i;
-                    
-                    // East Lanes:
-                    for(i = 0; i < SV->number_of_east_lanes; i++) {
-                        SV->east_lanes[i].light = RED;
-                    }
-                    
-                    // West Lanes:
-                    for(i = 0; i < SV->number_of_west_lanes; i++) {
-                        SV->west_lanes[i].light = RED;
-                    }
-                    
-                    // Change the North-South lanes to GREEN:
-                    for(i = 0; i < SV->number_of_north_lanes; i++) {
-                        SV->north_lanes[i].light = GREEN;
-                    }
-                    
-                    for(i = 0; i < SV->number_of_south_lanes; i++) {
-                        SV->south_lanes[i].light = GREEN;
-                    }
-                    SV->time_remaining = SV->total_time;
-                }
-            }*/
 			
-			/******************************************/
-			/***** MOVING CARS AFTER LIGHT CHANGE *****/
-			/******************************************/
-			
-			/*
-			// If the traffic direction is NORTH-SOUTH:
-			if(SV->traffic_direction == NORTH_SOUTH) {
-				
-				// Check if the NORTH-SOUTH direction has an arrow:
-				if(SV->has_turning_arrow) {
-					
-					// Check if the NORTH-SOUTH left turns are green:
-					if(SV->north_lanes[0].light == GREEN) {
-						
-						/****************************/
-						/***** MOVING LEFT CARS *****/
-						/****************************/
-						
-						/*
-						// Only select cars from the left lane in the NORTH-SOUTH:
-						int i;
-						int number_of_cars_north_left_deployed = 0;
-						int number_of_cars_south_left_deployed = 0;
-
-						// North lane - release cars based on time remaining
-						for(i = 0; i < SV->time_remaining; i++) {
-							
-							// If we hit the number of cars in this lane, break:
-							if(i < SV->north_lanes[0].number_of_cars) {
-
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->north_lanes[0].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->north_lanes[0].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->north_lanes[0].cars[i].y_to_go;
-								new_message->car.start_time = SV->north_lanes[0].cars[i].start_time;
-								new_message->car.end_time = SV->north_lanes[0].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->north_lanes[0].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-
-								number_of_cars_north_left_deployed++;
-							}
-							
-							if(i < SV->south_lanes[0].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->south_lanes[0].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->south_lanes[0].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->south_lanes[0].cars[i].y_to_go;
-								new_message->car.start_time = SV->south_lanes[0].cars[i].start_time;
-								new_message->car.end_time = SV->south_lanes[0].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->south_lanes[0].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_south_left_deployed++;
-							}
-						}
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_north_left_deployed; i++) {
-							SV->north_lanes[0].cars[i] = SV->north_lanes[0].cars[i+number_of_cars_north_left_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->north_lanes[0].number_of_cars -= number_of_cars_north_left_deployed;
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_south_left_deployed; i++) {
-							SV->south_lanes[0].cars[i] = SV->south_lanes[0].cars[i+number_of_cars_south_left_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->south_lanes[0].number_of_cars -= number_of_cars_south_left_deployed;
-					} else {
-						
-						/**************************************/
-						/***** MOVING CENTER & RIGHT CARS *****/
-						/**************************************/
-						
-						/*
-						// Only select cars from the center and right lane in the NORTH-SOUTH:
-						int i;
-						int number_of_cars_north_center_deployed = 0;
-						int number_of_cars_north_right_deployed = 0;
-						int number_of_cars_south_center_deployed = 0;
-						int number_of_cars_south_right_deployed = 0;
-						
-						for(i = 0; i < SV->time_remaining; i++) {
-							
-							// If we hit the number of cars in this lane, break:
-							if(i < SV->north_lanes[1].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->north_lanes[1].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->north_lanes[1].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->north_lanes[1].cars[i].y_to_go;
-								new_message->car.start_time = SV->north_lanes[1].cars[i].start_time;
-								new_message->car.end_time = SV->north_lanes[1].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->north_lanes[1].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_north_center_deployed++;
-							}
-							
-							if(i < SV->north_lanes[2].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->north_lanes[2].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->north_lanes[2].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->north_lanes[2].cars[i].y_to_go;
-								new_message->car.start_time = SV->north_lanes[2].cars[i].start_time;
-								new_message->car.end_time = SV->north_lanes[2].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->north_lanes[2].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_north_right_deployed++;
-							}
-							
-							if(i < SV->south_lanes[1].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->south_lanes[1].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->south_lanes[1].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->south_lanes[1].cars[i].y_to_go;
-								new_message->car.start_time = SV->south_lanes[1].cars[i].start_time;
-								new_message->car.end_time = SV->south_lanes[1].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->south_lanes[1].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_south_center_deployed++;
-							}
-							
-							if(i < SV->south_lanes[2].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->south_lanes[2].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->south_lanes[2].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->south_lanes[2].cars[i].y_to_go;
-								new_message->car.start_time = SV->south_lanes[2].cars[i].start_time;
-								new_message->car.end_time = SV->south_lanes[2].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->south_lanes[2].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_south_right_deployed++;
-							}
-						}
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_north_center_deployed; i++) {
-							SV->north_lanes[1].cars[i] = SV->north_lanes[1].cars[i+number_of_cars_north_center_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->north_lanes[1].number_of_cars -= number_of_cars_north_center_deployed;
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_north_right_deployed; i++) {
-							SV->north_lanes[2].cars[i] = SV->north_lanes[2].cars[i+number_of_cars_north_right_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->north_lanes[2].number_of_cars -= number_of_cars_north_right_deployed;
-
-						// move cars up in the array
-						for(i=0; i<number_of_cars_south_center_deployed; i++) {
-							SV->south_lanes[1].cars[i] = SV->south_lanes[1].cars[i+number_of_cars_south_center_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->south_lanes[1].number_of_cars -= number_of_cars_south_center_deployed;
-
-						// move cars up in the array
-						for(i=0; i<number_of_cars_south_right_deployed; i++) {
-							SV->south_lanes[2].cars[i] = SV->south_lanes[2].cars[i+number_of_cars_south_right_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->south_lanes[2].number_of_cars -= number_of_cars_south_right_deployed;
-					}
-				} else {
-					/**************************************/
-					/***** MOVING CENTER & RIGHT CARS *****/
-					/**************************************/
-					
-					/*
-					// Only select cars from the center and right lane in the NORTH-SOUTH:
-					int i;
-					int number_of_cars_north_center_deployed = 0;
-					int number_of_cars_north_right_deployed = 0;
-					int number_of_cars_south_center_deployed = 0;
-					int number_of_cars_south_right_deployed = 0;
-					
-					for(i = 0; i < SV->time_remaining; i++) {
-						
-						// If we hit the number of cars in this lane, break:
-						if(i < SV->north_lanes[0].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->north_lanes[0].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->north_lanes[0].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->north_lanes[0].cars[i].y_to_go;
-							new_message->car.start_time = SV->north_lanes[0].cars[i].start_time;
-							new_message->car.end_time = SV->north_lanes[0].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->north_lanes[0].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_north_center_deployed++;
-						}
-						
-						if(i < SV->north_lanes[1].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->north_lanes[1].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->north_lanes[1].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->north_lanes[1].cars[i].y_to_go;
-							new_message->car.start_time = SV->north_lanes[1].cars[i].start_time;
-							new_message->car.end_time = SV->north_lanes[1].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->north_lanes[1].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_north_right_deployed++;
-						}
-						
-						if(i < SV->south_lanes[0].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->south_lanes[0].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->south_lanes[0].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->south_lanes[0].cars[i].y_to_go;
-							new_message->car.start_time = SV->south_lanes[0].cars[i].start_time;
-							new_message->car.end_time = SV->south_lanes[0].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->south_lanes[0].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_south_center_deployed++;
-						}
-						
-						if(i < SV->south_lanes[1].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->south_lanes[1].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->south_lanes[1].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->south_lanes[1].cars[i].y_to_go;
-							new_message->car.start_time = SV->south_lanes[1].cars[i].start_time;
-							new_message->car.end_time = SV->south_lanes[1].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->south_lanes[1].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_south_right_deployed++;
-						}
-					}
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_north_center_deployed; i++) {
-						SV->north_lanes[0].cars[i] = SV->north_lanes[0].cars[i+number_of_cars_north_center_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->north_lanes[0].number_of_cars -= number_of_cars_north_center_deployed;
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_north_right_deployed; i++) {
-						SV->north_lanes[1].cars[i] = SV->north_lanes[1].cars[i+number_of_cars_north_right_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->north_lanes[1].number_of_cars -= number_of_cars_north_right_deployed;
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_south_center_deployed; i++) {
-						SV->south_lanes[0].cars[i] = SV->south_lanes[0].cars[i+number_of_cars_south_center_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->south_lanes[0].number_of_cars -= number_of_cars_south_center_deployed;
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_south_right_deployed; i++) {
-						SV->south_lanes[1].cars[i] = SV->south_lanes[1].cars[i+number_of_cars_south_right_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->south_lanes[1].number_of_cars -= number_of_cars_south_right_deployed;
-				}
-			}
-			else if(SV->traffic_direction == EAST_WEST) {
-				// Check if the NORTH-SOUTH direction has an arrow:
-				if(SV->has_turning_arrow) {
-					
-					// Check if the NORTH-SOUTH left turns are green:
-					if(SV->east_lanes[0].light == GREEN) {
-						
-						/****************************/
-						/***** MOVING LEFT CARS *****/
-						/***** **********************/
-						
-						/*
-						// Only select cars from the left lane in the NORTH-SOUTH:
-						int i;
-						int number_of_cars_east_left_deployed = 0;
-						int number_of_cars_west_left_deployed = 0;
-						
-						// North lane - release cars based on time remaining
-						for(i = 0; i < SV->time_remaining; i++) {
-							
-							// If we hit the number of cars in this lane, break:
-							if(i < SV->east_lanes[0].number_of_cars) {
-								
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->east_lanes[0].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->east_lanes[0].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->east_lanes[0].cars[i].y_to_go;
-								new_message->car.start_time = SV->east_lanes[0].cars[i].start_time;
-								new_message->car.end_time = SV->east_lanes[0].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->east_lanes[0].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_east_left_deployed++;
-							}
-							
-							if(i < SV->west_lanes[0].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->west_lanes[0].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->west_lanes[0].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->west_lanes[0].cars[i].y_to_go;
-								new_message->car.start_time = SV->west_lanes[0].cars[i].start_time;
-								new_message->car.end_time = SV->west_lanes[0].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->west_lanes[0].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_west_left_deployed++;
-							}
-						}
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_east_left_deployed; i++) {
-							SV->east_lanes[0].cars[i] = SV->east_lanes[0].cars[i+number_of_cars_east_left_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->east_lanes[0].number_of_cars -= number_of_cars_east_left_deployed;
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_west_left_deployed; i++) {
-							SV->west_lanes[0].cars[i] = SV->west_lanes[0].cars[i+number_of_cars_west_left_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->west_lanes[0].number_of_cars -= number_of_cars_west_left_deployed;
-					} else {
-						
-						/**************************************/
-						/***** MOVING CENTER & RIGHT CARS *****/
-						/**************************************/
-						
-						/*
-						// Only select cars from the center and right lane in the NORTH-SOUTH:
-						int i;
-						int number_of_cars_east_center_deployed = 0;
-						int number_of_cars_east_right_deployed = 0;
-						int number_of_cars_west_center_deployed = 0;
-						int number_of_cars_west_right_deployed = 0;
-						
-						for(i = 0; i < SV->time_remaining; i++) {
-							
-							// If we hit the number of cars in this lane, break:
-							if(i < SV->east_lanes[1].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->east_lanes[1].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->east_lanes[1].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->east_lanes[1].cars[i].y_to_go;
-								new_message->car.start_time = SV->east_lanes[1].cars[i].start_time;
-								new_message->car.end_time = SV->east_lanes[1].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->east_lanes[1].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_east_center_deployed++;
-							}
-							
-							if(i < SV->east_lanes[2].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->east_lanes[2].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->east_lanes[2].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->east_lanes[2].cars[i].y_to_go;
-								new_message->car.start_time = SV->east_lanes[2].cars[i].start_time;
-								new_message->car.end_time = SV->east_lanes[2].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->east_lanes[2].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_east_right_deployed++;
-							}
-							
-							if(i < SV->west_lanes[1].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->west_lanes[1].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->west_lanes[1].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->west_lanes[1].cars[i].y_to_go;
-								new_message->car.start_time = SV->west_lanes[1].cars[i].start_time;
-								new_message->car.end_time = SV->west_lanes[1].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->west_lanes[1].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_west_center_deployed++;
-							}
-							
-							if(i < SV->west_lanes[2].number_of_cars) {
-								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-								current_event = tw_event_new(SV->west_lanes[2].cars[i].next_intersection, ts, LP);
-								new_message = (message_data*) tw_event_data(current_event);
-								new_message->car.x_to_go = SV->west_lanes[2].cars[i].x_to_go;
-								new_message->car.y_to_go = SV->west_lanes[2].cars[i].y_to_go;
-								new_message->car.start_time = SV->west_lanes[2].cars[i].start_time;
-								new_message->car.end_time = SV->west_lanes[2].cars[i].end_time;
-								new_message->car.has_turned_yet = SV->west_lanes[2].cars[i].has_turned_yet;
-								// change event to a car arriving now that light has changed
-								new_message->event_type = CAR_ARRIVES;
-								tw_event_send(current_event);
-								
-								number_of_cars_west_right_deployed++;
-							}
-						}
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_east_center_deployed; i++) {
-							SV->east_lanes[1].cars[i] = SV->east_lanes[1].cars[i+number_of_cars_east_center_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->east_lanes[1].number_of_cars -= number_of_cars_east_center_deployed;
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_east_right_deployed; i++) {
-							SV->east_lanes[2].cars[i] = SV->east_lanes[2].cars[i+number_of_cars_east_right_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->east_lanes[2].number_of_cars -= number_of_cars_east_right_deployed;
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_west_center_deployed; i++) {
-							SV->west_lanes[1].cars[i] = SV->west_lanes[1].cars[i+number_of_cars_west_center_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->west_lanes[1].number_of_cars -= number_of_cars_west_center_deployed;
-						
-						// move cars up in the array
-						for(i=0; i<number_of_cars_west_right_deployed; i++) {
-							SV->west_lanes[2].cars[i] = SV->west_lanes[2].cars[i+number_of_cars_west_right_deployed];
-						}
-						// Decrement the number of cars in the lane:
-						SV->west_lanes[2].number_of_cars -= number_of_cars_west_right_deployed;
-					}
-				} else {
-					/**************************************/
-					/***** MOVING CENTER & RIGHT CARS *****/
-					/**************************************/
-					
-					/*
-					// Only select cars from the center and right lane in the NORTH-SOUTH:
-					int i;
-					int number_of_cars_east_center_deployed = 0;
-					int number_of_cars_east_right_deployed = 0;
-					int number_of_cars_west_center_deployed = 0;
-					int number_of_cars_west_right_deployed = 0;
-					
-					for(i = 0; i < SV->time_remaining; i++) {
-						
-						// If we hit the number of cars in this lane, break:
-						if(i < SV->east_lanes[0].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->east_lanes[0].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->east_lanes[0].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->east_lanes[0].cars[i].y_to_go;
-							new_message->car.start_time = SV->east_lanes[0].cars[i].start_time;
-							new_message->car.end_time = SV->east_lanes[0].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->east_lanes[0].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_east_center_deployed++;
-						}
-						
-						if(i < SV->east_lanes[1].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->east_lanes[1].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->east_lanes[1].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->east_lanes[1].cars[i].y_to_go;
-							new_message->car.start_time = SV->east_lanes[1].cars[i].start_time;
-							new_message->car.end_time = SV->east_lanes[1].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->east_lanes[1].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_east_right_deployed++;
-						}
-						
-						if(i < SV->west_lanes[0].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->west_lanes[0].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->west_lanes[0].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->west_lanes[0].cars[i].y_to_go;
-							new_message->car.start_time = SV->west_lanes[0].cars[i].start_time;
-							new_message->car.end_time = SV->west_lanes[0].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->west_lanes[0].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_west_center_deployed++;
-						}
-						
-						if(i < SV->west_lanes[1].number_of_cars) {
-							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
-							current_event = tw_event_new(SV->west_lanes[1].cars[i].next_intersection, ts, LP);
-							new_message = (message_data*) tw_event_data(current_event);
-							new_message->car.x_to_go = SV->west_lanes[1].cars[i].x_to_go;
-							new_message->car.y_to_go = SV->west_lanes[1].cars[i].y_to_go;
-							new_message->car.start_time = SV->west_lanes[1].cars[i].start_time;
-							new_message->car.end_time = SV->west_lanes[1].cars[i].end_time;
-							new_message->car.has_turned_yet = SV->west_lanes[1].cars[i].has_turned_yet;
-							// change event to a car arriving now that light has changed
-							new_message->event_type = CAR_ARRIVES;
-							tw_event_send(current_event);
-							
-							number_of_cars_west_right_deployed++;
-						}
-					}
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_east_center_deployed; i++) {
-						SV->east_lanes[0].cars[i] = SV->east_lanes[0].cars[i+number_of_cars_east_center_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->east_lanes[0].number_of_cars -= number_of_cars_east_center_deployed;
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_east_right_deployed; i++) {
-						SV->east_lanes[1].cars[i] = SV->east_lanes[1].cars[i+number_of_cars_east_right_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->east_lanes[1].number_of_cars -= number_of_cars_east_right_deployed;
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_west_center_deployed; i++) {
-						SV->west_lanes[0].cars[i] = SV->west_lanes[0].cars[i+number_of_cars_west_center_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->west_lanes[0].number_of_cars -= number_of_cars_west_center_deployed;
-					
-					// move cars up in the array
-					for(i=0; i<number_of_cars_west_right_deployed; i++) {
-						SV->west_lanes[1].cars[i] = SV->west_lanes[1].cars[i+number_of_cars_west_right_deployed];
-					}
-					// Decrement the number of cars in the lane:
-					SV->west_lanes[1].number_of_cars -= number_of_cars_west_right_deployed;
-				}
-			}
-
-            break;*/
-            
 		// Handle the case where the car arrives at an intersection:
         case CAR_ARRIVES:
 
@@ -1125,7 +372,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			}
 
 			// Schedule a departure event:
-			ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+			ts = tw_rand_exponential(LP->rng, g_mean_service);
 			current_event = tw_event_new(LP->gid, ts, LP);
 			new_message = (message_data *) tw_event_data(current_event);
 			new_message->car.x_to_go = M->car.x_to_go;
@@ -1135,13 +382,13 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			new_message->car.next_intersection = M->car.next_intersection;
 			new_message->car.start_time = M->car.start_time;
 			new_message->car.end_time = M->car.end_time;
-			new_message->event_type = DEPARTURE;
+			new_message->event_type = CAR_DEPARTS;
 			tw_event_send(current_event);
 
             break;
 
 		// Handle the case in which a car departs a traffic light:
-		case DEPARTURE:
+		case CAR_DEPARTS:
 			
 			SV->time_remaining--;
 			
@@ -1149,7 +396,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			if(M->car.y_to_go > 0) {
 				if(SV->traffic_direction == NORTH_SOUTH) {
 					SV->num_cars_out_north++;
-					ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+					ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 					current_event = tw_event_new(LP->gid, ts, LP);
 					new_message = (message_data *) tw_event_data(current_event);
 					new_message->car.x_to_go = M->car.x_to_go;
@@ -1167,7 +414,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			else if(M->car.y_to_go < 0) {
 				if(SV->traffic_direction == NORTH_SOUTH) {
 					SV->num_cars_out_south++;
-					ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+					ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 					current_event = tw_event_new(LP->gid, ts, LP);
 					new_message = (message_data *) tw_event_data(current_event);
 					new_message->car.x_to_go = M->car.x_to_go;
@@ -1185,7 +432,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				if(SV->traffic_direction == NORTH_SOUTH) {
 					if(M->car.y_to_go_original > 0 && M->car.x_to_go > 0) {
 						SV->num_cars_out_east++;
-						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 						current_event = tw_event_new(LP->gid, ts, LP);
 						new_message = (message_data *) tw_event_data(current_event);
 						new_message->car.x_to_go = M->car.x_to_go;
@@ -1201,7 +448,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					else if(M->car.y_to_go_original > 0 && M->car.x_to_go < 0) {
 						if(SV->num_cars_in_north == 0) {
 							SV->num_cars_out_west++;
-							ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(LP->gid, ts, LP);
 							new_message = (message_data *) tw_event_data(current_event);
 							new_message->car.x_to_go = M->car.x_to_go;
@@ -1224,12 +471,12 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							new_message->car.next_intersection = M->car.next_intersection;
 							new_message->car.start_time = M->car.start_time;
 							new_message->car.end_time = M->car.end_time;
-							new_message->event_type = DEPARTURE;
+							new_message->event_type = CAR_DEPARTS;
 						}
 					}
 					else if(M->car.y_to_go_original < 0 && M->car.x_to_go > 0) {
 						if(SV->num_cars_in_south == 0) {
-							ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(LP->gid, ts, LP);
 							new_message = (message_data *) tw_event_data(current_event);
 							new_message->car.x_to_go = M->car.x_to_go;
@@ -1252,12 +499,12 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							new_message->car.next_intersection = M->car.next_intersection;
 							new_message->car.start_time = M->car.start_time;
 							new_message->car.end_time = M->car.end_time;
-							new_message->event_type = DEPARTURE;
+							new_message->event_type = CAR_DEPARTS;
 						}
 					}
 					else if(M->car.y_to_go_original < 0 && M->car.x_to_go < 0) {
 						SV->num_cars_out_west++;
-						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 						current_event = tw_event_new(LP->gid, ts, LP);
 						new_message = (message_data *) tw_event_data(current_event);
 						new_message->car.x_to_go = M->car.x_to_go;
@@ -1274,7 +521,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				else if(M->car.x_to_go > 0) {
 					if(SV->traffic_direction == EAST_WEST) {
 						SV->num_cars_out_east++;
-						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 						current_event = tw_event_new(LP->gid, ts, LP);
 						new_message = (message_data *) tw_event_data(current_event);
 						new_message->car.x_to_go = M->car.x_to_go;
@@ -1291,7 +538,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				else if(M->car.x_to_go < 0) {
 					if(SV->traffic_direction == EAST_WEST) {
 						SV->num_cars_out_west++;
-						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 						current_event = tw_event_new(LP->gid, ts, LP);
 						new_message = (message_data *) tw_event_data(current_event);
 						new_message->car.x_to_go = M->car.x_to_go;
@@ -1327,221 +574,37 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 
     // Handle the events defined in the "events" enumeration, but in reverse:
     switch(M->event_type) {
-
-        // Handle the LIGHT_CHANGE Event in reverse:
+            
+			// Handle the LIGHT_CHANGE event IF AND ONLY IF the time remaining on this intersection == 0:
         case LIGHT_CHANGE:
-
-            // Check if the traffic is permitted north-south:
-            if(SV->traffic_direction == NORTH_SOUTH) {
-
-                // Check if there are green arrows:
-                if(SV->has_turning_arrow) {
-                    // Check if this left-turn is GREEN:
-                    if(SV->north_lanes[0].light == GREEN) {
-
-                        /* 
-                         * Turn the NORTH/SOUTH left-turn arrow to RED; 
-                         * switch all EAST-WEST lights from red to green:
-                         */
-                         SV->north_lanes[0].light = SV->south_lanes[0].light = RED;
-
-                         // Turn the EAST-WEST straight lights from red to green:
-                         int i;
-                         for(i = 1; i < SV->number_of_west_lanes; i++) {
-                            SV->west_lanes[i].light = GREEN;
-                         }
-
-                         for(i = 1; i < SV->number_of_east_lanes; i++) {
-                            SV->east_lanes[i].light = GREEN;
-                         }
-
-                         // Change the permitted direction to EAST-WEST:
-                         SV->traffic_direction = EAST_WEST;
-                         
-                         // Reset the traffic light timer:
-						SV->time_remaining = SV->total_time;
-                    } else {
-                        /*
-                         * The left turn is RED; turn off the NORTH-SOUTH straight lights
-                         * and turn on the left-turn light GREEN:
-                         */
-
-                        // Turn on the left-turn lights to green:
-                         SV->north_lanes[0].light = SV->south_lanes[0].light = GREEN;
-
-                         // Turn off the NORTH-SOUTH straight lights to red:
-                         int i;
-
-                         // North Lanes:
-                         for(i = 1; i < SV->number_of_north_lanes; i++) {
-                            SV->north_lanes[i].light = RED;
-                         }
-
-                         // South Lanes:
-                         for(i = 1; i < SV->number_of_south_lanes; i++) {
-                            SV->south_lanes[i].light = RED;
-                         }
-
-                         // Reset the total time to the left total time:
-                         SV->time_remaining = SV->left_total_time;
-
-                    }
-                } else {
-                    /*
-                     * This intersection does not have any green left arrows; just
-                     * change directions.
-                     */
-
-                     // Change permitted direction to EAST-WEST:
-                     SV->traffic_direction = EAST_WEST;
-
-                     int i;
-
-                     // Turn off the NORTH-SOUTH lanes:
-
-                     // Northbound Lights:
-                     for(i = 0; i < SV->number_of_north_lanes; i++) {
-                        SV->north_lanes[i].light = RED;
-                     }
-
-                     // Southbound Lights:
-                     for(i = 0; i < SV->number_of_south_lanes; i++) {
-                        SV->south_lanes[i].light = RED;
-                     }
-
-                     // Turn on the EAST-WEST lanes:
-
-                     // Eastbound Lights:
-                     for(i = 0; i < SV->number_of_east_lanes; i++) {
-                        SV->east_lanes[i].light = GREEN;
-                     }
-
-                     // Westbound Lights:
-                     for(i = 0; i < SV->number_of_west_lanes; i++) {
-                        SV->west_lanes[i].light = GREEN;
-                     }
-
-                     // Reset the time to the total time:
-                     SV->time_remaining = SV->total_time;
-                }
-            } else if(SV->traffic_direction == EAST_WEST) {
-                // Traffic is moving EAST-WEST:
-
-                // Check if East-West bound lanes have a left-turn arrow:
-                if(SV->has_turning_arrow) {
-                    // Check if this left-turn is GREEN:
-                    if(SV->east_lanes[0].light == GREEN) {
-
-                        /*
-                         * This light is green; turn the left-turn arrow to RED
-                         * and turn on the NORTH-SOUTH lanes to GREEN:
-                         */
-                         SV->east_lanes[0].light = SV->west_lanes[0].light = RED;
-
-                         // Switch directions to NORTH-SOUTH:
-                         SV->traffic_direction = NORTH_SOUTH;
-
-                         // Turn on the NORTH-SOUTH lanes to GREEN:
-                         int i;
-
-                         for(i = 1; i < SV->number_of_north_lanes; i++) {
-                            SV->north_lanes[i].light = GREEN;
-                         }
-
-                         for(i = 1; i < SV->number_of_south_lanes; i++) {
-                            SV->south_lanes[i].light = GREEN;
-                         }
-
-                         // Reset the total time:
-                         SV->time_remaining = SV->total_time;
-                    } else {
-                        /*
-                         * The left turn is RED; turn off EAST-WEST straight lanes 
-                         * and turn on the EAST-WEST left turn arrows:
-                         */
-                         SV->east_lanes[0].light = SV->west_lanes[0].light = GREEN;
-
-                         int i;
-
-                         // East Lanes:
-                         for(i = 1; i < SV->number_of_east_lanes; i++) {
-                            SV->east_lanes[0].light = RED;
-                         }
-
-                         // West Lanes:
-                         for(i = 1; i < SV->number_of_west_lanes; i++) {
-                            SV->west_lanes[0].light = RED;
-                         }
-
-                         // Reset the total time left to the left total time:
-                         SV->time_remaining = SV->left_total_time;
-                    }
-                } else {
-                    /*
-                     * This intersection does not have any green left-arrows; just
-                     * change directions to NORTH-SOUTH and turn off all EAST-WEST lights:
-                     */
-                     SV->traffic_direction = NORTH_SOUTH;
-
-                     int i;
-
-                     // East and West Lanes:
-                     for(i = 0; i < SV->number_of_east_lanes; i++) {
-                        SV->east_lanes[i].light = RED;
-                     }
-                     for(i = 0; i < SV->number_of_west_lanes; i++) {
-                        SV->west_lanes[i].light = RED;
-                     }
-
-                     // Turn on all lights North and South:
-                     for(i = 0; i < SV->number_of_north_lanes; i++) {
-                        SV->north_lanes[i].light = GREEN;
-                     }
-                     for(i = 0; i < SV->number_of_south_lanes; i++) {
-                        SV->south_lanes[i].light = GREEN;
-                     }
-
-                     // Reset the total amount of time:
-                     SV->time_remaining = SV->total_time;
-                }
-            }
-
-            // Reverse the event:
-            tw_rand_reverse_unif(LP->rng);
-            break;
-
-        case CAR_ARRIVES:
-            // Handle the case when a car arrives:
+            
+            // TIME EXPIRED!
 			
-			SV->total_cars_arrived--;
-            // Reverse follow the y path first:
-            if(M->car.y_to_go > 0) {
-                M->car.y_to_go++;
-                LP->gid = cell_compute_move(LP->gid, SOUTH);
-            } else if(M->car.y_to_go < 0) {
-                M->car.y_to_go--;
-                LP->gid = cell_compute_move(LP->gid, NORTH);
-            }
-
-            // Reverse once y is 0, follows x path:
-            else if(M->car.x_to_go > 0) {
-                M->car.x_to_go++;
-                LP->gid = cell_compute_move(LP->gid, WEST);
-            } else if(M->car.x_to_go < 0) {
-                M->car.x_to_go--;
-                LP->gid = cell_compute_move(LP->gid, EAST);
-            }
-			else {
-				M->car.end_time = tw_clock_now(LP->pe);
-				SV->total_cars_finished--;
-				break;
+            // Check if the traffic is permitted north-south (green on north and south lights):
+            if(SV->traffic_direction == NORTH_SOUTH) {
+                
+				// Switch permitted traffic to EAST_WEST:
+				SV->traffic_direction = EAST_WEST;
+			} else {
+				
+				// Traffic was permitted east-west; switch permitted traffic to NORTH_SOUTH:
+				SV->traffic_direction = NORTH_SOUTH;
 			}
 			
-            // Reverse the event:
-            tw_rand_reverse_unif(LP->rng);
-
-            break;
+			// Reset the total time on the light to the original time:
+			SV->time_remaining = SV->total_time;
+			break;
+		
+		case CAR_ARRIVES:
+			
+			break;
+		
+		case CAR_DEPARTS:
+			
+			break;
     }
+	
+	tw_rand_reverse_unif(LP->rng);
 
 } /** END FUNCTION intersection_reverse_eventhandler **/
 
