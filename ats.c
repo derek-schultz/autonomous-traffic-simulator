@@ -217,6 +217,18 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
     tw_event* current_event;
     message_data* new_message;
 
+	// Initialize the number of cars arriving into the intersection:
+	SV->num_cars_in_south = 0;
+	SV->num_cars_in_west = 0;
+	SV->num_cars_in_north = 0;
+	SV->num_cars_in_east = 0;
+
+	// Initialize the number of cars leaving the intersection
+	SV->num_cars_out_south = 0;
+	SV->num_cars_out_west = 0;
+	SV->num_cars_out_north = 0;
+	SV->num_cars_out_east = 0;
+	
     int i;
     for(i = 0; i < g_traffic_start_events; i++) {
         // Arrival time
@@ -251,6 +263,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 
     // Unknown time warp bit field:
     *(int*) CV = (int) 0;
+
+	// The time for this intersection has hit 0; schedule a LIGHT_CHANGE event:
+	if(SV->time_remaining == 0) {
+		M->event_type = LIGHT_CHANGE;			
+	}
     
     // Handle the events defined in the "events" enumeration:
     switch(M->event_type) {
@@ -259,10 +276,23 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
         case LIGHT_CHANGE:
             
             // TIME EXPIRED!
-
+		
             // Check if the traffic is permitted north-south (green on north and south lights):
             if(SV->traffic_direction == NORTH_SOUTH) {
                 
+				// Switch permitted traffic to EAST_WEST:
+				SV->traffic_direction == EAST_WEST;
+			} else {
+
+				// Traffic was permitted east-west; switch permitted traffic to NORTH_SOUTH:
+				SV->traffic_direction == NORTH_SOUTH;
+			}
+
+			// Reset the total time on the light to the original time:
+			SV->time_remaining = SV->total_time;
+			break;
+
+				/*
                 // Check if the left turning light is on (if any):
                 if(SV->has_turning_arrow) {
                     // Check if this left-turn is GREEN:
@@ -407,12 +437,13 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
                     }
                     SV->time_remaining = SV->total_time;
                 }
-            }
+            }*/
 			
 			/******************************************/
 			/***** MOVING CARS AFTER LIGHT CHANGE *****/
 			/******************************************/
 			
+			/*
 			// If the traffic direction is NORTH-SOUTH:
 			if(SV->traffic_direction == NORTH_SOUTH) {
 				
@@ -426,6 +457,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						/***** MOVING LEFT CARS *****/
 						/****************************/
 						
+						/*
 						// Only select cars from the left lane in the NORTH-SOUTH:
 						int i;
 						int number_of_cars_north_left_deployed = 0;
@@ -490,6 +522,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						/***** MOVING CENTER & RIGHT CARS *****/
 						/**************************************/
 						
+						/*
 						// Only select cars from the center and right lane in the NORTH-SOUTH:
 						int i;
 						int number_of_cars_north_center_deployed = 0;
@@ -602,6 +635,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					/***** MOVING CENTER & RIGHT CARS *****/
 					/**************************************/
 					
+					/*
 					// Only select cars from the center and right lane in the NORTH-SOUTH:
 					int i;
 					int number_of_cars_north_center_deployed = 0;
@@ -721,6 +755,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						/***** MOVING LEFT CARS *****/
 						/***** **********************/
 						
+						/*
 						// Only select cars from the left lane in the NORTH-SOUTH:
 						int i;
 						int number_of_cars_east_left_deployed = 0;
@@ -785,6 +820,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						/***** MOVING CENTER & RIGHT CARS *****/
 						/**************************************/
 						
+						/*
 						// Only select cars from the center and right lane in the NORTH-SOUTH:
 						int i;
 						int number_of_cars_east_center_deployed = 0;
@@ -897,6 +933,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					/***** MOVING CENTER & RIGHT CARS *****/
 					/**************************************/
 					
+					/*
 					// Only select cars from the center and right lane in the NORTH-SOUTH:
 					int i;
 					int number_of_cars_east_center_deployed = 0;
@@ -1006,12 +1043,17 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				}
 			}
 
-            break;
+            break;*/
             
+		// Handle the case where the car arrives at an intersection:
         case CAR_ARRIVES:
             
+			// Increment the total number of cars in this intersection:
+
 			SV->total_cars_arrived++;
 			// follows the y path first
+
+			// Car reached its destination:
 			if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {
 				M->car.end_time = tw_clock_now(LP->pe);
 				SV->total_cars_finished++;
@@ -1020,8 +1062,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					   M->car.y_to_go_original, (M->car.end_time - M->car.start_time));
 				break;
 			}
+
+			// The car is too far south; have the car head up north:
 			if(M->car.y_to_go > 0) {
-				SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
+				//SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
+
 				SV->south_lanes[1].number_of_cars++;
 				//M->car.y_to_go--;
 				//LP->gid = cell_compute_move(LP->gid, NORTH);

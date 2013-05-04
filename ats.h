@@ -88,7 +88,7 @@ unsigned int autonomous;
 /****************************************** ENUMS ****************************/
 
 // Events enumeration:
-enum events { LIGHT_CHANGE, CAR_ARRIVES };
+enum events { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
 
 // Traffic lights enumeration:
 enum light_colors { RED, GREEN };
@@ -133,10 +133,11 @@ typedef struct {
 } message_data;
 
 // Representation of a lane:
+/*
 typedef struct {
 
     // Number of cars in this lane:
-    car_type cars[30];
+    // car_type cars[30];
 
     // Number of cars in this lane:
     int number_of_cars;
@@ -144,9 +145,9 @@ typedef struct {
     // The traffic light color for this lane:
     enum light_colors light;
 
-} lane_type;
+} lane_type;*/
 
-// Representation of an intersection:
+// Representation of a 3-lane intersection:
 typedef struct {
 
     // Number of cars arrived at this intersection:
@@ -154,20 +155,34 @@ typedef struct {
     // Number of cars finished at this intersection:
     int total_cars_finished;
 
+	// Number of cars arriving in each direction:
+	int num_cars_in_south;
+	int num_cars_in_west;
+	int num_cars_in_north;
+	int num_cars_in_east;
+
+	// Number of cars leaving in each direction:
+	int num_cars_out_south;
+	int num_cars_out_west;
+	int num_cars_out_north;
+	int num_cars_out_east;
+
     // Four arrays to represent the number of lanes in each 4-way intersection:
-    lane_type north_lanes[MAX_LANES_PER_DIRECTION];
-    lane_type south_lanes[MAX_LANES_PER_DIRECTION];
-    lane_type west_lanes[MAX_LANES_PER_DIRECTION];
-    lane_type east_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type north_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type south_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type west_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type east_lanes[MAX_LANES_PER_DIRECTION];
 
     // Number of lanes for each direction:
+	/*
     int number_of_north_lanes;
     int number_of_south_lanes;
     int number_of_west_lanes;
     int number_of_east_lanes;
+	*/
     
     // Describes whether a direction will get a green arrow:
-    int has_turning_arrow;
+    //int has_turning_arrow;
 
     // Variable to hold the time remaining on the intersection:
     int time_remaining;
