@@ -247,8 +247,8 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
         new_message->event_type = CAR_ARRIVES;
         new_message->car.x_to_go = rand() % 200 - 99; // TODO: what is this?
         new_message->car.y_to_go = rand() % 200 - 99;
-		//new_message->car.x_to_go_original = new_message->car.x_to_go;
-		//new_message->car.y_to_go_original = new_message->car.y_to_go;
+		new_message->car.x_to_go_original = new_message->car.x_to_go;
+		new_message->car.y_to_go_original = new_message->car.y_to_go;
         new_message->car.start_time = tw_clock_now(LP->pe);
 		//new_message->car.has_turned_yet = 0;
 		
@@ -1130,6 +1130,8 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 			new_message = (message_data *) tw_event_data(current_event);
 			new_message->car.x_to_go = M->car.x_to_go;
 			new_message->car.y_to_go = M->car.y_to_go;
+			new_message->car.x_to_go_original = M->car.x_to_go_original;
+			new_message->car.y_to_go_original = M->car.y_to_go_original;
 			new_message->car.next_intersection = M->car.next_intersection;
 			new_message->car.start_time = M->car.start_time;
 			new_message->car.end_time = M->car.end_time;
@@ -1140,7 +1142,178 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 
 		// Handle the case in which a car departs a traffic light:
 		case DEPARTURE:
-
+			
+			SV->time_remaining--;
+			
+			// going in the north direction
+			if(M->car.y_to_go > 0) {
+				if(SV->traffic_direction == NORTH_SOUTH) {
+					SV->num_cars_out_north++;
+					ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+					current_event = tw_event_new(LP->gid, ts, LP);
+					new_message = (message_data *) tw_event_data(current_event);
+					new_message->car.x_to_go = M->car.x_to_go;
+					new_message->car.y_to_go = M->car.y_to_go;
+					new_message->car.x_to_go_original = M->car.x_to_go_original;
+					new_message->car.y_to_go_original = M->car.y_to_go_original;
+					new_message->car.next_intersection = M->car.next_intersection;
+					new_message->car.start_time = M->car.start_time;
+					new_message->car.end_time = M->car.end_time;
+					new_message->event_type = CAR_ARRIVES;
+					tw_event_send(current_event);
+				}
+			}
+			// going in the south direction
+			else if(M->car.y_to_go < 0) {
+				if(SV->traffic_direction == NORTH_SOUTH) {
+					SV->num_cars_out_south++;
+					ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+					current_event = tw_event_new(LP->gid, ts, LP);
+					new_message = (message_data *) tw_event_data(current_event);
+					new_message->car.x_to_go = M->car.x_to_go;
+					new_message->car.y_to_go = M->car.y_to_go;
+					new_message->car.x_to_go_original = M->car.x_to_go_original;
+					new_message->car.y_to_go_original = M->car.y_to_go_original;
+					new_message->car.next_intersection = M->car.next_intersection;
+					new_message->car.start_time = M->car.start_time;
+					new_message->car.end_time = M->car.end_time;
+					new_message->event_type = CAR_ARRIVES;
+					tw_event_send(current_event);
+				}
+			// needs to turn now
+			} else if(M->car.y_to_go == 0 && M->car.x_to_go == M->car.x_to_go_original) {
+				if(SV->traffic_direction == NORTH_SOUTH) {
+					if(M->car.y_to_go_original > 0 && M->car.x_to_go > 0) {
+						SV->num_cars_out_east++;
+						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						current_event = tw_event_new(LP->gid, ts, LP);
+						new_message = (message_data *) tw_event_data(current_event);
+						new_message->car.x_to_go = M->car.x_to_go;
+						new_message->car.y_to_go = M->car.y_to_go;
+						new_message->car.x_to_go_original = M->car.x_to_go_original;
+						new_message->car.y_to_go_original = M->car.y_to_go_original;
+						new_message->car.next_intersection = M->car.next_intersection;
+						new_message->car.start_time = M->car.start_time;
+						new_message->car.end_time = M->car.end_time;
+						new_message->event_type = CAR_ARRIVES;
+						tw_event_send(current_event);
+					}
+					else if(M->car.y_to_go_original > 0 && M->car.x_to_go < 0) {
+						if(SV->num_cars_in_north == 0) {
+							SV->num_cars_out_west++;
+							ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+							current_event = tw_event_new(LP->gid, ts, LP);
+							new_message = (message_data *) tw_event_data(current_event);
+							new_message->car.x_to_go = M->car.x_to_go;
+							new_message->car.y_to_go = M->car.y_to_go;
+							new_message->car.x_to_go_original = M->car.x_to_go_original;
+							new_message->car.y_to_go_original = M->car.y_to_go_original;
+							new_message->car.next_intersection = M->car.next_intersection;
+							new_message->car.start_time = M->car.start_time;
+							new_message->car.end_time = M->car.end_time;
+							new_message->event_type = CAR_ARRIVES;
+							tw_event_send(current_event);
+						} else {
+							ts = 0;
+							current_event = tw_event_new(LP->gid, ts, LP);
+							new_message = (message_data *) tw_event_data(current_event);
+							new_message->car.x_to_go = M->car.x_to_go;
+							new_message->car.y_to_go = M->car.y_to_go;
+							new_message->car.x_to_go_original = M->car.x_to_go_original;
+							new_message->car.y_to_go_original = M->car.y_to_go_original;
+							new_message->car.next_intersection = M->car.next_intersection;
+							new_message->car.start_time = M->car.start_time;
+							new_message->car.end_time = M->car.end_time;
+							new_message->event_type = DEPARTURE;
+						}
+					}
+					else if(M->car.y_to_go_original < 0 && M->car.x_to_go > 0) {
+						if(SV->num_cars_in_south == 0) {
+							ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+							current_event = tw_event_new(LP->gid, ts, LP);
+							new_message = (message_data *) tw_event_data(current_event);
+							new_message->car.x_to_go = M->car.x_to_go;
+							new_message->car.y_to_go = M->car.y_to_go;
+							new_message->car.x_to_go_original = M->car.x_to_go_original;
+							new_message->car.y_to_go_original = M->car.y_to_go_original;
+							new_message->car.next_intersection = M->car.next_intersection;
+							new_message->car.start_time = M->car.start_time;
+							new_message->car.end_time = M->car.end_time;
+							new_message->event_type = CAR_ARRIVES;
+							tw_event_send(current_event);
+						} else {
+							ts = 0;
+							current_event = tw_event_new(LP->gid, ts, LP);
+							new_message = (message_data *) tw_event_data(current_event);
+							new_message->car.x_to_go = M->car.x_to_go;
+							new_message->car.y_to_go = M->car.y_to_go;
+							new_message->car.x_to_go_original = M->car.x_to_go_original;
+							new_message->car.y_to_go_original = M->car.y_to_go_original;
+							new_message->car.next_intersection = M->car.next_intersection;
+							new_message->car.start_time = M->car.start_time;
+							new_message->car.end_time = M->car.end_time;
+							new_message->event_type = DEPARTURE;
+						}
+					}
+					else if(M->car.y_to_go_original < 0 && M->car.x_to_go < 0) {
+						SV->num_cars_out_west++;
+						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						current_event = tw_event_new(LP->gid, ts, LP);
+						new_message = (message_data *) tw_event_data(current_event);
+						new_message->car.x_to_go = M->car.x_to_go;
+						new_message->car.y_to_go = M->car.y_to_go;
+						new_message->car.x_to_go_original = M->car.x_to_go_original;
+						new_message->car.y_to_go_original = M->car.y_to_go_original;
+						new_message->car.next_intersection = M->car.next_intersection;
+						new_message->car.start_time = M->car.start_time;
+						new_message->car.end_time = M->car.end_time;
+						new_message->event_type = CAR_ARRIVES;
+						tw_event_send(current_event);
+					}
+				}
+				else if(M->car.x_to_go > 0) {
+					if(SV->traffic_direction == EAST_WEST) {
+						SV->num_cars_out_east++;
+						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						current_event = tw_event_new(LP->gid, ts, LP);
+						new_message = (message_data *) tw_event_data(current_event);
+						new_message->car.x_to_go = M->car.x_to_go;
+						new_message->car.y_to_go = M->car.y_to_go;
+						new_message->car.x_to_go_original = M->car.x_to_go_original;
+						new_message->car.y_to_go_original = M->car.y_to_go_original;
+						new_message->car.next_intersection = M->car.next_intersection;
+						new_message->car.start_time = M->car.start_time;
+						new_message->car.end_time = M->car.end_time;
+						new_message->event_type = CAR_ARRIVES;
+						tw_event_send(current_event);
+					}
+				}
+				else if(M->car.x_to_go < 0) {
+					if(SV->traffic_direction == EAST_WEST) {
+						SV->num_cars_out_west++;
+						ts = tw_rand_exponential(LP->rng, MEAN_SERVICE) + 20;
+						current_event = tw_event_new(LP->gid, ts, LP);
+						new_message = (message_data *) tw_event_data(current_event);
+						new_message->car.x_to_go = M->car.x_to_go;
+						new_message->car.y_to_go = M->car.y_to_go;
+						new_message->car.x_to_go_original = M->car.x_to_go_original;
+						new_message->car.y_to_go_original = M->car.y_to_go_original;
+						new_message->car.next_intersection = M->car.next_intersection;
+						new_message->car.start_time = M->car.start_time;
+						new_message->car.end_time = M->car.end_time;
+						new_message->event_type = CAR_ARRIVES;
+						tw_event_send(current_event);
+					}
+				}
+			}
+			
+			if(SV->time_remaining == 0) {
+				ts = 0;
+				current_event = tw_event_new(LP->gid, ts, LP);
+				new_message = (message_data *) tw_event_data(current_event);
+				new_message->event_type = LIGHT_CHANGE;
+			}
+			
 			break;
 
     }

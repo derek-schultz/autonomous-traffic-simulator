@@ -111,8 +111,8 @@ typedef struct {
     int x_to_go;
     int y_to_go;
 	
-	//int x_to_go_original;
-    //int y_to_go_original;
+	int x_to_go_original;
+    int y_to_go_original;
     
 	//int has_turned_yet;
 	
