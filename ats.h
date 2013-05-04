@@ -53,7 +53,7 @@ tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
 tw_stime g_mean_service = 1.0;
 
 // QUESTION: lookahead?
-tw_stime g_lookahead = 1.0;
+tw_stime g_lookahead = 20.0;
 
 // QUESTION: mult?
 // Why are all these static?

@@ -220,7 +220,7 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
     int i;
     for(i = 0; i < g_traffic_start_events; i++) {
         // Arrival time
-        ts = tw_rand_exponential(LP->rng, g_mean_service);
+        ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 
         current_event = tw_event_new(LP->gid, ts, LP);
         new_message = (message_data*)tw_event_data(current_event);
@@ -438,7 +438,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							if(i < SV->north_lanes[0].number_of_cars) {
 
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->north_lanes[0].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->north_lanes[0].cars[i].x_to_go;
@@ -455,7 +455,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->south_lanes[0].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->south_lanes[0].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->south_lanes[0].cars[i].x_to_go;
@@ -502,7 +502,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							// If we hit the number of cars in this lane, break:
 							if(i < SV->north_lanes[1].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->north_lanes[1].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->north_lanes[1].cars[i].x_to_go;
@@ -519,7 +519,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->north_lanes[2].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->north_lanes[2].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->north_lanes[2].cars[i].x_to_go;
@@ -536,7 +536,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->south_lanes[1].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->south_lanes[1].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->south_lanes[1].cars[i].x_to_go;
@@ -553,7 +553,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->south_lanes[2].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->south_lanes[2].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->south_lanes[2].cars[i].x_to_go;
@@ -614,7 +614,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						// If we hit the number of cars in this lane, break:
 						if(i < SV->north_lanes[0].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->north_lanes[0].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->north_lanes[0].cars[i].x_to_go;
@@ -631,7 +631,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						if(i < SV->north_lanes[1].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->north_lanes[1].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->north_lanes[1].cars[i].x_to_go;
@@ -648,7 +648,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						if(i < SV->south_lanes[0].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->south_lanes[0].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->south_lanes[0].cars[i].x_to_go;
@@ -665,7 +665,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						if(i < SV->south_lanes[1].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->south_lanes[1].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->south_lanes[1].cars[i].x_to_go;
@@ -733,7 +733,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							if(i < SV->east_lanes[0].number_of_cars) {
 								
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->east_lanes[0].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->east_lanes[0].cars[i].x_to_go;
@@ -750,7 +750,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->west_lanes[0].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->west_lanes[0].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->west_lanes[0].cars[i].x_to_go;
@@ -797,7 +797,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							// If we hit the number of cars in this lane, break:
 							if(i < SV->east_lanes[1].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->east_lanes[1].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->east_lanes[1].cars[i].x_to_go;
@@ -814,7 +814,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->east_lanes[2].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->east_lanes[2].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->east_lanes[2].cars[i].x_to_go;
@@ -831,7 +831,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->west_lanes[1].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->west_lanes[1].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->west_lanes[1].cars[i].x_to_go;
@@ -848,7 +848,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 							
 							if(i < SV->west_lanes[2].number_of_cars) {
 								// Schedule a CAR_ARRIVES event for each car's next intersection:
-								ts = tw_rand_exponential(LP->rng, g_mean_service);
+								ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 								current_event = tw_event_new(SV->west_lanes[2].cars[i].next_intersection, ts, LP);
 								new_message = (message_data*) tw_event_data(current_event);
 								new_message->car.x_to_go = SV->west_lanes[2].cars[i].x_to_go;
@@ -909,7 +909,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						// If we hit the number of cars in this lane, break:
 						if(i < SV->east_lanes[0].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->east_lanes[0].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->east_lanes[0].cars[i].x_to_go;
@@ -926,7 +926,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						if(i < SV->east_lanes[1].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->east_lanes[1].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->east_lanes[1].cars[i].x_to_go;
@@ -943,7 +943,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						if(i < SV->west_lanes[0].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->west_lanes[0].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->west_lanes[0].cars[i].x_to_go;
@@ -960,7 +960,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 						
 						if(i < SV->west_lanes[1].number_of_cars) {
 							// Schedule a CAR_ARRIVES event for each car's next intersection:
-							ts = tw_rand_exponential(LP->rng, g_mean_service);
+							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(SV->west_lanes[1].cars[i].next_intersection, ts, LP);
 							new_message = (message_data*) tw_event_data(current_event);
 							new_message->car.x_to_go = SV->west_lanes[1].cars[i].x_to_go;
