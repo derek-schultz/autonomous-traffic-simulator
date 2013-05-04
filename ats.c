@@ -80,7 +80,9 @@ int main(int argc, char* argv[]) {
     tw_run();
     tw_end();
 
-	
+	printf("Number of cars finised %lld\n", g_cars_finished);
+	printf("Number of cars that arrived %lld\n", g_total_cars);
+	printf("Average travel time %lld\n", g_average_time);
 	
     return 0;
 } /** END FUNCTION main **/
