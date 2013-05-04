@@ -111,16 +111,16 @@ typedef struct {
     int x_to_go;
     int y_to_go;
 	
-	int x_to_go_original;
-    int y_to_go_original;
+	//int x_to_go_original;
+    //int y_to_go_original;
     
-	int has_turned_yet;
+	//int has_turned_yet;
 	
 	// Variable to hold the next intersection:
 	tw_lpid next_intersection;
 
 	// Variable to hold the past intersection this car was in:
-	tw_lpid past_intersection;
+	//tw_lpid past_intersection;
 
 } car_type;
 

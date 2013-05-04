@@ -228,6 +228,13 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
 	SV->num_cars_out_west = 0;
 	SV->num_cars_out_north = 0;
 	SV->num_cars_out_east = 0;
+
+	// Initialize the total number of cars arrived:
+	SV->total_cars_arrived = 0;
+	SV->total_cars_finished = 0;
+
+	// Initialize total_time and remaining_time:
+	SV->total_time = remaining_time = 10;
 	
     int i;
     for(i = 0; i < g_traffic_start_events; i++) {
@@ -240,10 +247,10 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
         new_message->event_type = CAR_ARRIVES;
         new_message->car.x_to_go = rand() % 200 - 99; // TODO: what is this?
         new_message->car.y_to_go = rand() % 200 - 99;
-		new_message->car.x_to_go_original = new_message->car.x_to_go;
-		new_message->car.y_to_go_original = new_message->car.y_to_go;
+		//new_message->car.x_to_go_original = new_message->car.x_to_go;
+		//new_message->car.y_to_go_original = new_message->car.y_to_go;
         new_message->car.start_time = tw_clock_now(LP->pe);
-		new_message->car.has_turned_yet = 0;
+		//new_message->car.has_turned_yet = 0;
 		
         tw_event_send(current_event);
     }
@@ -263,11 +270,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 
     // Unknown time warp bit field:
     *(int*) CV = (int) 0;
-
-	// The time for this intersection has hit 0; schedule a LIGHT_CHANGE event:
-	if(SV->time_remaining == 0) {
-		M->event_type = LIGHT_CHANGE;			
-	}
     
     // Handle the events defined in the "events" enumeration:
     switch(M->event_type) {
@@ -1047,11 +1049,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
             
 		// Handle the case where the car arrives at an intersection:
         case CAR_ARRIVES:
-            
-			// Increment the total number of cars in this intersection:
-
-			SV->total_cars_arrived++;
-			// follows the y path first
 
 			// Car reached its destination:
 			if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {
@@ -1062,62 +1059,83 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					   M->car.y_to_go_original, (M->car.end_time - M->car.start_time));
 				break;
 			}
+       
+			// Increment the total number of cars in this intersection:
+			SV->total_cars_arrived++;
+
+			// follows the y path first
 
 			// The car is too far south; have the car head up north:
 			if(M->car.y_to_go > 0) {
 				//SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
 
-				SV->south_lanes[1].number_of_cars++;
+				//SV->south_lanes[1].number_of_cars++;
 				//M->car.y_to_go--;
 				//LP->gid = cell_compute_move(LP->gid, NORTH);
-				
+
+				// Add a car in the south lane:
+				SV->num_cars_in_south++;				
+
 				// Calculate the next intersection in the NORTH direction:
 				M->car.next_intersection = cell_compute_move(LP->gid, NORTH);
+
+				// Decrement the distance to travel up north:
+				M->car.y_to_go--;
 			}
 			else if(M->car.y_to_go < 0) {
-				SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
-				SV->north_lanes[1].number_of_cars++;
+				//SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
+				//SV->north_lanes[1].number_of_cars++;
 				//M->car.y_to_go++;
 				//LP->gid = cell_compute_move(LP->gid, SOUTH);
 
+				// Add a car in the north lane:
+				SV->num_cars_in_north++;
+
 				// Calculate the next intersection in the SOUTH direction:
 				M->car.next_intersection = cell_compute_move(LP->gid, SOUTH);
-			}
-			else if(M->car.y_to_go == 0) {
-				if(M->car.has_turned_yet) {
-					if(M->car.x_to_go > 0) {
-						SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
-						SV->west_lanes[1].number_of_cars++;
 
-						// Calculate the next intersection in the EAST direction:
-						M->car.next_intersection = cell_compute_move(LP->gid, EAST);
-					}
-					else if(M->car.x_to_go < 0) {
-						SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
-						SV->east_lanes[1].number_of_cars++;
+				// Decrement the distance to travel down south:
+				M->car.y_to_go++;
+			}
+			else if(M->car.x_to_go > 0) {
+				//SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
+				//SV->west_lanes[1].number_of_cars++;
+
+				// Add a car in the west lane:
+				SV->num_cars_in_west++;
+
+				// Calculate the next intersection in the EAST direction:
+				M->car.next_intersection = cell_compute_move(LP->gid, EAST);
+
+				// Decrement the distance to travel east:
+				M->car.x_to_go--;
+			}
+			else if(M->car.x_to_go < 0) {
+				//SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
+				//SV->east_lanes[1].number_of_cars++;
+
+				// Add a car in the east lane:
+				SV->num_cars_in_east++;
 					
-						// Calculate the next intersection in the WEST direction:
-						M->car.next_intersection = cell_compute_move(LP->gid, WEST);
-					}
-				}
-				else if(M->car.y_to_go_original > 0) {
-					M->car.has_turned_yet = 1;
-					SV->south_lanes[2].cars[SV->south_lanes[2].number_of_cars] = M->car;
-					SV->south_lanes[2].number_of_cars++;
-
-					// Calculate the next intersection in the NORTH direction:
-					M->car.next_intersection = cell_compute_move(LP->gid, NORTH);
-				}
-				else if(M->car.y_to_go_original < 0) {
-					M->car.has_turned_yet = 1;
-					SV->north_lanes[0].cars[SV->north_lanes[0].number_of_cars] = M->car;
-					SV->north_lanes[0].number_of_cars++;
-
-					// Calculate the next intersection in the SOUTH direction:
-					M->car.next_intersection = cell_compute_move(LP->gid, SOUTH);
-				}
+				// Calculate the next intersection in the WEST direction:
+				M->car.next_intersection = cell_compute_move(LP->gid, WEST);
 				
+				// Decrement the distance to travel west:
+				M->car.x_to_go++;
 			}
+
+			// Schedule a departure event:
+			ts = tw_rand_exponential(LP->rng, MEAN_SERVICE);
+			current_event = tw_event_new(LP->gid, ts, LP);
+			new_message = (message_data *) tw_event_data(current_event);
+			new_message->car.x_to_go = M->car.x_to_go;
+			new_message->car.y_to_go = M->car.y_to_go;
+			new_message->car.next_intersection = M->car.next_intersection;
+			new_message->car.start_time = M->car.start_time;
+			new_message->car.end_time = M->car.end_time;
+			new_message->event_type = DEPARTURE;
+			tw_event_send(current_event);
+
             break;
 
     }
