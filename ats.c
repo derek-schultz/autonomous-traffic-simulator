@@ -476,6 +476,7 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 					}
 					else if(M->car.y_to_go_original < 0 && M->car.x_to_go > 0) {
 						if(SV->num_cars_in_south == 0) {
+							SV->num_cars_out_east++;
 							ts = tw_rand_exponential(LP->rng, g_mean_service) + 20;
 							current_event = tw_event_new(LP->gid, ts, LP);
 							new_message = (message_data *) tw_event_data(current_event);
@@ -597,9 +598,98 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 		
 		case CAR_ARRIVES:
 			
+			// Increment the total number of cars in this intersection:
+			SV->total_cars_arrived--;
+			
+			// follows the y path first
+			
+			// The car is too far south; have the car head up north:
+			if(M->car.y_to_go > 0) {
+				//SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
+				
+				//SV->south_lanes[1].number_of_cars++;
+				//M->car.y_to_go--;
+				//LP->gid = cell_compute_move(LP->gid, NORTH);
+				
+				// Add a car in the south lane:
+				SV->num_cars_in_south--;
+			}
+			else if(M->car.y_to_go < 0) {
+				//SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
+				//SV->north_lanes[1].number_of_cars++;
+				//M->car.y_to_go++;
+				//LP->gid = cell_compute_move(LP->gid, SOUTH);
+				
+				// Add a car in the north lane:
+				SV->num_cars_in_north--;
+			}
+			else if(M->car.x_to_go > 0) {
+				//SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
+				//SV->west_lanes[1].number_of_cars++;
+				
+				// Add a car in the west lane:
+				SV->num_cars_in_west--;
+			}
+			else if(M->car.x_to_go < 0) {
+				//SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
+				//SV->east_lanes[1].number_of_cars++;
+				
+				// Add a car in the east lane:
+				SV->num_cars_in_east--;
+			}
+			
 			break;
 		
 		case CAR_DEPARTS:
+			
+			SV->time_remaining++;
+			
+			// going in the north direction
+			if(M->car.y_to_go > 0) {
+				if(SV->traffic_direction == NORTH_SOUTH) {
+					SV->num_cars_out_north--;
+				}
+			}
+			// going in the south direction
+			else if(M->car.y_to_go < 0) {
+				if(SV->traffic_direction == NORTH_SOUTH) {
+					SV->num_cars_out_south--;
+				}
+				// needs to turn now
+			} else if(M->car.y_to_go == 0 && M->car.x_to_go == M->car.x_to_go_original) {
+				if(SV->traffic_direction == NORTH_SOUTH) {
+					if(M->car.y_to_go_original > 0 && M->car.x_to_go > 0) {
+						SV->num_cars_out_east--;
+					}
+					else if(M->car.y_to_go_original > 0 && M->car.x_to_go < 0) {
+						if(SV->num_cars_in_north == 0) {
+							SV->num_cars_out_west--;
+						}
+					}
+					else if(M->car.y_to_go_original < 0 && M->car.x_to_go > 0) {
+						if(SV->num_cars_in_south == 0) {
+							SV->num_cars_out_east--;
+						}
+					}
+					else if(M->car.y_to_go_original < 0 && M->car.x_to_go < 0) {
+						SV->num_cars_out_west--;
+					}
+				}
+				else if(M->car.x_to_go > 0) {
+					if(SV->traffic_direction == EAST_WEST) {
+						SV->num_cars_out_east--;
+					}
+				}
+				else if(M->car.x_to_go < 0) {
+					if(SV->traffic_direction == EAST_WEST) {
+						SV->num_cars_out_west--;
+					}
+				}
+			}
+			
+			if(SV->time_remaining == 0) {
+				SV->time_remaining++;
+			}
 			
 			break;
     }
