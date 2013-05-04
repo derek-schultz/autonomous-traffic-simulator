@@ -119,6 +119,9 @@ typedef struct {
 	// Variable to hold the next intersection:
 	tw_lpid next_intersection;
 
+	// Variable to hold the past intersection this car was in:
+	tw_lpid past_intersection;
+
 } car_type;
 
 // Message repesentation:

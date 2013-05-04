@@ -1084,16 +1084,8 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
     // Unknown time warp bit field:
     *(int*) CV = (int) 0;
 
-    // If the time_remaining is 0, execute a light change:
-    if(SV->time_remaining == 0) {
-        M->event_type = LIGHT_CHANGE;
-    }
-
     // Handle the events defined in the "events" enumeration, but in reverse:
     switch(M->event_type) {
-
-        // Increment the amount of time remaining:
-        SV->time_remaining++;
 
         // Handle the LIGHT_CHANGE Event in reverse:
         case LIGHT_CHANGE:
