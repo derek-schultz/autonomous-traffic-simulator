@@ -1138,6 +1138,11 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 
             break;
 
+		// Handle the case in which a car departs a traffic light:
+		case DEPARTURE:
+
+			break;
+
     }
 } /** END FUNCTION intersection_eventhandler **/
 
