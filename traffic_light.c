@@ -61,23 +61,11 @@ void traffic_light_intersection_startup(intersection_state* SV, tw_lp* LP) {
         new_message->car.y_to_go = tw_rand_integer(LP->rng, -MAX_TRAVEL_DISTANCE, MAX_TRAVEL_DISTANCE);
         new_message->car.x_to_go_original = new_message->car.x_to_go;
         new_message->car.y_to_go_original = new_message->car.y_to_go;
-        new_message->car.has_turned = 0;
-        new_message->car.start_time = tw_now(LP);
-        if (new_message->car.y_to_go > 0) {
-            new_message->car.position = SOUTH;
-        } else if (new_message->car.y_to_go < 0) {
-            new_message->car.position = NORTH;
-        } else if (new_message->car.y_to_go == 0) {
+        if (new_message->car.y_to_go == 0)
             new_message->car.has_turned = 1;
-            if (new_message->car.x_to_go > 0) {
-                new_message->car.position = EAST;
-            } else if (new_message->car.x_to_go < 0) {
-                new_message->car.position = WEST;
-            } else {
-                // Already there?? not acceptible...
-                goto assign_rand_dest
-            }
-        }
+        else
+            new_message->car.has_turned = 0;
+        new_message->car.start_time = tw_now(LP);
 
         tw_event_send(current_event);
     }
@@ -190,6 +178,102 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
             // Increment the total number of cars in this intersection:
             SV->total_cars_arrived++;
 
+            // follows the y path first
+
+            // The car is too far south; have the car head up north:
+            if(M->car.y_to_go > 0) {
+
+                // Add a car in the south lane:
+                SV->num_cars_south++;
+                M->car.position = SOUTH;
+
+                // Calculate the next intersection in the NORTH direction:
+                next_intersection = cell_compute_move(LP->gid, NORTH);
+
+                // Decrement the distance to travel up north:
+                M->car.y_to_go--;
+            }
+            else if(M->car.y_to_go < 0) {
+
+                // Add a car in the north lane:
+                SV->num_cars_north++;
+                M->car.position = NORTH;
+
+                // Calculate the next intersection in the SOUTH direction:
+                next_intersection = cell_compute_move(LP->gid, SOUTH);
+
+                // Decrement the distance to travel down south:
+                M->car.y_to_go++;
+            }
+            else if(M->car.y_to_go == 0) {
+
+                if(M->car.has_turned) {
+
+                    if(M->car.x_to_go > 0) {
+
+                        // Add a car in the west lane:
+                        SV->num_cars_west++;
+                        M->car.position = WEST;
+
+                        // Calculate the next intersection in the EAST direction:
+                        next_intersection = cell_compute_move(LP->gid, EAST);
+
+                        // Decrement the distance to travel east:
+                        M->car.x_to_go--;
+                    }
+                    else if(M->car.x_to_go < 0) {
+
+                        // Add a car in the east lane:
+                        SV->num_cars_east++;
+                        M->car.position = EAST;
+                            
+                        // Calculate the next intersection in the WEST direction:
+                        next_intersection = cell_compute_move(LP->gid, WEST);
+                        
+                        // Decrement the distance to travel west:
+                        M->car.x_to_go++;
+                    }
+
+                }
+
+                else {
+
+                    if(M->car.x_to_go > 0) {
+
+                        if(M->car.y_to_go_original > 0) {
+                            SV->num_cars_south++;
+                            M->car.position = SOUTH;
+                        } else {
+                            SV->num_cars_north_left++;
+                            M->car.position = NORTH_LEFT;
+                        }
+
+                        // Calculate the next intersection in the EAST direction:
+                        next_intersection = cell_compute_move(LP->gid, EAST);
+
+                        // Decrement the distance to travel east:
+                        M->car.x_to_go--;
+                    }
+                    else if(M->car.x_to_go < 0) {
+
+                        if(M->car.y_to_go_original > 0) {
+                            SV->num_cars_south_left++;
+                            M->car.position = SOUTH_LEFT;
+                        } else {
+                            SV->num_cars_north++;
+                            M->car.position = NORTH;
+                        }
+
+                        // Calculate the next intersection in the WEST direction:
+                        next_intersection = cell_compute_move(LP->gid, WEST);
+                        
+                        // Decrement the distance to travel west:
+                        M->car.x_to_go++;
+                    }
+
+                }
+            }
+
             switch (M->car.position) {
             case NORTH:
                 queue_wait_time = SV->num_cars_north * CAR_ACCELERATION_DELAY;
@@ -215,92 +299,6 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
             case WEST_LEFT:
                 queue_wait_time = SV->num_cars_west_left * CAR_ACCELERATION_DELAY;
                 break;
-            }
-
-            // follows the y path first
-
-            // The car is too far south; have the car head up north:
-            if(M->car.y_to_go > 0) {
-
-                // Add a car in the south lane:
-                SV->num_cars_south++;                
-
-                // Calculate the next intersection in the NORTH direction:
-                next_intersection = cell_compute_move(LP->gid, NORTH);
-
-                // Decrement the distance to travel up north:
-                M->car.y_to_go--;
-            }
-            else if(M->car.y_to_go < 0) {
-
-                // Add a car in the north lane:
-                SV->num_cars_north++;
-
-                // Calculate the next intersection in the SOUTH direction:
-                next_intersection = cell_compute_move(LP->gid, SOUTH);
-
-                // Decrement the distance to travel down south:
-                M->car.y_to_go++;
-            }
-            else if(M->car.y_to_go == 0) {
-
-                if(M->car.has_turned) {
-
-                    if(M->car.x_to_go > 0) {
-
-                        // Add a car in the west lane:
-                        SV->num_cars_west++;
-
-                        // Calculate the next intersection in the EAST direction:
-                        next_intersection = cell_compute_move(LP->gid, EAST);
-
-                        // Decrement the distance to travel east:
-                        M->car.x_to_go--;
-                    }
-                    else if(M->car.x_to_go < 0) {
-
-                        // Add a car in the east lane:
-                        SV->num_cars_east++;
-                            
-                        // Calculate the next intersection in the WEST direction:
-                        next_intersection = cell_compute_move(LP->gid, WEST);
-                        
-                        // Decrement the distance to travel west:
-                        M->car.x_to_go++;
-                    }
-
-                }
-
-                else {
-
-                    if(M->car.x_to_go > 0) {
-
-                        switch(M->car.position) {
-                        case NORTH:
-                            SV->num_cars_north++;
-                        }
-                        // Add a car in the west lane:
-                        SV->num_cars_west++;
-
-                        // Calculate the next intersection in the EAST direction:
-                        next_intersection = cell_compute_move(LP->gid, EAST);
-
-                        // Decrement the distance to travel east:
-                        M->car.x_to_go--;
-                    }
-                    else if(M->car.x_to_go < 0) {
-
-                        // Add a car in the east lane:
-                        SV->num_cars_east++;
-                            
-                        // Calculate the next intersection in the WEST direction:
-                        next_intersection = cell_compute_move(LP->gid, WEST);
-                        
-                        // Decrement the distance to travel west:
-                        M->car.x_to_go++;
-                    }
-
-                }
             }
 
             /* If the light is green and there aren't too many cars ahead
