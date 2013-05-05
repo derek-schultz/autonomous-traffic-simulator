@@ -175,14 +175,14 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         case CAR_ARRIVES:
 
             tw_lpid next_intersection;
-            tw_stime time_to_reach_intersection;
+            tw_stime queue_wait_time;
 
             // Car reached its destination:
             if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {
                 M->car.end_time = tw_now(LP);
                 SV->total_cars_finished++;
                 g_total_time += (M->car.end_time - M->car.start_time);
-                printf("Car finished with x: %d and y:%d with time: %d\n", M->car.x_to_go_original,
+                printf("Car finished with x: %d and y: %d with time: %d\n", M->car.x_to_go_original,
                        M->car.y_to_go_original, (M->car.end_time - M->car.start_time));
                 break;
             }
@@ -192,28 +192,28 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 
             switch (M->car.position) {
             case NORTH:
-                time_to_reach_intersection = SV->num_cars_north * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_north * CAR_ACCELERATION_DELAY;
                 break;
             case NORTH_LEFT:
-                time_to_reach_intersection = SV->num_cars_north_left * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_north_left * CAR_ACCELERATION_DELAY;
                 break;
             case EAST:
-                time_to_reach_intersection = SV->num_cars_east * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_east * CAR_ACCELERATION_DELAY;
                 break;
             case EAST_LEFT:
-                time_to_reach_intersection = SV->num_cars_east_left * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_east_left * CAR_ACCELERATION_DELAY;
                 break;
             case SOUTH:
-                time_to_reach_intersection = SV->num_cars_south * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_south * CAR_ACCELERATION_DELAY;
                 break;
             case SOUTH_LEFT:
-                time_to_reach_intersection = SV->num_cars_south_left * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_south_left * CAR_ACCELERATION_DELAY;
                 break;
             case WEST:
-                time_to_reach_intersection = SV->num_cars_west * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_west * CAR_ACCELERATION_DELAY;
                 break;
             case WEST_LEFT:
-                time_to_reach_intersection = SV->num_cars_west_left * CAR_ACCELERATION_DELAY;
+                queue_wait_time = SV->num_cars_west_left * CAR_ACCELERATION_DELAY;
                 break;
             }
 
@@ -305,7 +305,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 
             /* If the light is green and there aren't too many cars ahead
              * we can make it through right now! Schedule the next arrival */
-            if (tw_now(LP) + time_to_reach_intersection < light_green_until) {
+            if (tw_now(LP) + queue_wait_time < light_green_until) {
                 ts = tw_rand_exponential(LP->rng, MEAN_TRAVEL_TIME);
             }
 
@@ -315,11 +315,11 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
                 if (M->car.position == NORTH || M->car.position == SOUTH ||
                     M->car.position == EAST  || M->car.position == WEST) {
                     ts = tw_rand_exponential(LP->rng, MEAN_TRAVEL_TIME)
-                         + (time_to_reach_intersection / GREEN_LIGHT_DURATION)
+                         + (queue_wait_time / GREEN_LIGHT_DURATION)
                          * g_full_cycle_duration;
                 } else {
                     ts = tw_rand_exponential(LP->rng, MEAN_TRAVEL_TIME)
-                         + (time_to_reach_intersection / LEFT_TURN_LIGHT_DURATION)
+                         + (queue_wait_time / LEFT_TURN_LIGHT_DURATION)
                          * g_full_cycle_duration;
                 }
             }
