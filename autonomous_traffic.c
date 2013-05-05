@@ -36,7 +36,12 @@ int will_collide(travel_directions a, travel_directions b) {
 }
 
 
-void autonomous_traffic_intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
+void autonomous_traffic_intersection_eventhandler(
+        intersection_state* SV,
+        tw_bf* CV,
+        message_data* M,
+        tw_lp* LP) {
+
     // Time warp starting time:
     tw_stime ts = 0.0;
     
@@ -54,7 +59,9 @@ void autonomous_traffic_intersection_eventhandler(intersection_state* SV, tw_bf*
 
     case CARS_GO:
         int i;
-        car_type cars[4 * MAX_LANES_PER_DIRECTION][4 * MAX_LANES_PER_DIRECTION];
+        car_type cars[4 * MAX_LANES_PER_DIRECTION]
+                     [4 * MAX_LANES_PER_DIRECTION];
+                     
         for (i = 0; i < MAX_LANES_PER_DIRECTION; i++) {
             SV->north_lanes[i]
         }

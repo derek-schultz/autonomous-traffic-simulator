@@ -39,11 +39,11 @@ tw_lptype autonomous_traffic_lps[] = {
     { 0 },
 };
 
-
 //Command Line Arguments
 const tw_optdef model_opts[] = {
     TWOPT_GROUP("Traffic Model"),
-    TWOPT_UINT("autonomous", autonomous, "1 for autonomous vehicles, 0 for traditional intersections"),
+    TWOPT_UINT("autonomous", autonomous,
+               "1 for autonomous vehicles, 0 for traditional intersections"),
     TWOPT_END(),
 };
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     tw_init(&argc, &argv);
 
     if (g_lookahead > 1.0)
-        tw_error(TW_LOC, "Lookahead must be less than 1.0\n"); // QUESTION: why?
+        tw_error(TW_LOC, "Lookahead must be less than 1.0\n"); // QUESTION: why
 
     // Reset mean based on lookahead. QUESTION: why?
     g_mean = g_mean - g_lookahead;
@@ -74,7 +74,8 @@ int main(int argc, char* argv[]) {
 
     // TODO: clean this up?
     g_nlp_per_pe = (MAP_WIDTH * MAP_HEIGHT) / (tw_nnodes() * g_tw_npe);
-    g_tw_events_per_pe = (g_mult * g_nlp_per_pe * g_traffic_start_events) + g_optimistic_memory;
+    g_tw_events_per_pe = (g_mult * g_nlp_per_pe * g_traffic_start_events) 
+                         + g_optimistic_memory;
     num_cells_per_kp = (MAP_WIDTH * MAP_HEIGHT) / (NUM_VP_X * NUM_VP_Y);
     vp_per_proc = (NUM_VP_X * NUM_VP_Y) / ((tw_nnodes() * g_tw_npe)) ;
     g_vp_per_proc = vp_per_proc;
@@ -130,7 +131,8 @@ tw_lp* cell_mapping_to_lp(tw_lpid lpid) {
 
 #ifdef ROSS_runtime_check  
     if (index >= g_tw_nlp)
-        tw_error(TW_LOC, "index (%llu) beyond g_tw_nlp (%llu) range \n", index, g_tw_nlp);
+        tw_error(TW_LOC, "index (%llu) beyond g_tw_nlp (%llu) range \n", index,
+                 g_tw_nlp);
 #endif /* ROSS_runtime_check */
 
     return g_tw_lp[index];
@@ -149,7 +151,8 @@ tw_lpid cell_mapping_to_local_index(tw_lpid lpid) {
     tw_lpid index = vp_index + vp_num * g_cells_per_vp;
 
     if (index >= g_tw_nlp)
-        tw_error(TW_LOC, "index (%llu) beyond g_tw_nlp (%llu) range \n", index, g_tw_nlp);
+        tw_error(TW_LOC, "index (%llu) beyond g_tw_nlp (%llu) range \n", index,
+                 g_tw_nlp);
 
     return index;
 }
@@ -173,17 +176,25 @@ void traffic_grid_mapping() {
             lpid = (x + (y * MAP_WIDTH));
             if (g_tw_mynode == cell_mapping_lp_to_pe(lpid)) {
                 kpid = local_lp_count / num_cells_per_kp;
-                local_lp_count++; // MUST COME AFTER!! DO NOT PRE-INCREMENT ELSE KPID is WRONG!!
+                
+                // MUST COME AFTER!! DO NOT PRE-INCREMENT ELSE KPID is WRONG!!
+                local_lp_count++;
 
                 if (kpid >= g_tw_nkp)
-                    tw_error(TW_LOC, "Attempting to mapping a KPid (%llu) for Global LPid %llu that is beyond g_tw_nkp (%llu)\n",
-                    kpid, lpid, g_tw_nkp );
+                    tw_error(TW_LOC, "Attempting to mapping a KPid (%llu) for
+                        Global LPid %llu that is beyond g_tw_nkp (%llu)\n",
+                        kpid, lpid, g_tw_nkp );
 
-                tw_lp_onpe(cell_mapping_to_local_index(lpid), g_tw_pe[0], lpid);
+                tw_lp_onpe(cell_mapping_to_local_index(lpid), g_tw_pe[0],
+                           lpid);
+
                 if (g_tw_kp[kpid] == NULL)
                     tw_kp_onpe(kpid, g_tw_pe[0]);
-                tw_lp_onkp(g_tw_lp[cell_mapping_to_local_index(lpid)], g_tw_kp[kpid]);
-                tw_lp_settype(cell_mapping_to_local_index(lpid), &traffic_lps[0]);
+
+                tw_lp_onkp(g_tw_lp[cell_mapping_to_local_index(lpid)],
+                           g_tw_kp[kpid]);
+                tw_lp_settype(cell_mapping_to_local_index(lpid),
+                                                          &traffic_lps[0]);
             }
         }
     }
