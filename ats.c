@@ -316,11 +316,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 
 			// The car is too far south; have the car head up north:
 			if(M->car.y_to_go > 0) {
-				//SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
-
-				//SV->south_lanes[1].number_of_cars++;
-				//M->car.y_to_go--;
-				//LP->gid = cell_compute_move(LP->gid, NORTH);
 
 				// Add a car in the south lane:
 				SV->num_cars_in_south++;				
@@ -332,10 +327,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				M->car.y_to_go--;
 			}
 			else if(M->car.y_to_go < 0) {
-				//SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
-				//SV->north_lanes[1].number_of_cars++;
-				//M->car.y_to_go++;
-				//LP->gid = cell_compute_move(LP->gid, SOUTH);
 
 				// Add a car in the north lane:
 				SV->num_cars_in_north++;
@@ -347,8 +338,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				M->car.y_to_go++;
 			}
 			else if(M->car.x_to_go > 0) {
-				//SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
-				//SV->west_lanes[1].number_of_cars++;
 
 				// Add a car in the west lane:
 				SV->num_cars_in_west++;
@@ -360,8 +349,6 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 				M->car.x_to_go--;
 			}
 			else if(M->car.x_to_go < 0) {
-				//SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
-				//SV->east_lanes[1].number_of_cars++;
 
 				// Add a car in the east lane:
 				SV->num_cars_in_east++;
@@ -607,20 +594,11 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 			
 			// The car is too far south; have the car head up north:
 			if(M->car.y_to_go > 0) {
-				//SV->south_lanes[1].cars[SV->south_lanes[1].number_of_cars] = M->car;
-				
-				//SV->south_lanes[1].number_of_cars++;
-				//M->car.y_to_go--;
-				//LP->gid = cell_compute_move(LP->gid, NORTH);
 				
 				// Add a car in the south lane:
 				SV->num_cars_in_south--;
 			}
 			else if(M->car.y_to_go < 0) {
-				//SV->north_lanes[1].cars[SV->north_lanes[1].number_of_cars] = M->car;
-				//SV->north_lanes[1].number_of_cars++;
-				//M->car.y_to_go++;
-				//LP->gid = cell_compute_move(LP->gid, SOUTH);
 				
 				// Add a car in the north lane:
 				SV->num_cars_in_north--;
