@@ -86,7 +86,7 @@ unsigned int autonomous;
 /****************************************** ENUMS ****************************/
 
 // Events enumeration:
-enum events { LIGHT_CHANGE, CAR_ARRIVES };
+enum events { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
 
 // Traffic lights enumeration:
 enum light_colors { RED, GREEN };
@@ -94,6 +94,7 @@ enum light_colors { RED, GREEN };
 // Directions to determine which way traffic is permitted in an intersection:
 enum intersection_directions { NORTH_SOUTH, EAST_WEST };
 enum cardinal_directions { WEST, EAST, SOUTH, NORTH };
+enum travel_directions { NL, NR, NS, EL, ER, ES, SL, SR, SS, WL, WR, WS };
 
 /**************************************** END ENUMS BLOCK ********************/
 
@@ -177,8 +178,11 @@ typedef struct {
 // Initialization of an intersection:
 void intersection_startup(intersection_state*, tw_lp*);
 
-// Event handler for an intersection:
-void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+// Event handler for an intersection (with the old traffic lights)
+void traffic_light_intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+
+// Event handler for an intersection (with autonomous vehicles)
+void autonomous_traffic_intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 
 // Reverse event handler for an intersection:
 void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);

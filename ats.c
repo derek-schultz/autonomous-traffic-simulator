@@ -15,10 +15,10 @@
 #include "ats.h"
 
 // Function roles:
-tw_lptype traffic_lps[] = {
+tw_lptype traffic_light_lps[] = {
     {
         (init_f) intersection_startup,
-        (event_f) intersection_eventhandler,
+        (event_f) traffic_light_intersection_eventhandler,
         (revent_f) intersection_reverse_eventhandler,
         (final_f) intersection_statistics_collectstats,
         (map_f) cell_mapping_lp_to_pe,
@@ -26,6 +26,19 @@ tw_lptype traffic_lps[] = {
     },
     { 0 },
 };
+
+tw_lptype autonomous_traffic_lps[] = {
+    {
+        (init_f) intersection_startup,
+        (event_f) autonomous_traffic_intersection_eventhandler,
+        (revent_f) intersection_reverse_eventhandler,
+        (final_f) intersection_statistics_collectstats,
+        (map_f) cell_mapping_lp_to_pe,
+        sizeof(intersection_state)
+    },
+    { 0 },
+};
+
 
 //Command Line Arguments
 const tw_optdef model_opts[] = {
@@ -38,8 +51,9 @@ const tw_optdef model_opts[] = {
 int main(int argc, char* argv[]) {
     // QUESTION: I don't know what this is or why it is set so low
     g_tw_ts_end = 30; // ROSS default is 100000.0
-    g_tw_gvt_interval = 16; // ROSS default is 16
-
+    g_tw_gvt_interval = 512; // ROSS default is 16
+    g_tw_mblock = 8; // ROSS default to 16
+    
     // QUESTION: Jeremy says this is necessary if compiled with MEMORY queues
     g_tw_memory_nqueues = 1;
 
@@ -75,7 +89,12 @@ int main(int argc, char* argv[]) {
 
     int i;
     for(i = 0; i < g_tw_nlp; i++)
-        tw_lp_settype(i, &traffic_lps[0]);
+    {
+        if (autonomous)
+            tw_lp_settype(i, &autonomous_traffic_lps[0]);
+        else
+            tw_lp_settype(i, &traffic_light_lps[0]);
+    }
 
     tw_run();
     tw_end();
@@ -233,7 +252,7 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
 }
 
 // Event handler for an intersection:
-void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
+void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
 
     // Time warp starting time:
     tw_stime ts = 0.0;
@@ -462,3 +481,95 @@ void intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* 
 
     }
 } /** END FUNCTION intersection_eventhandler **/
+
+/*
+ * Determines whether cars a and b will colide if they travel through the
+ * intersection at the same time.
+ * NL indicates that the car is coming from the north and turning left
+ * ES indicates that the car is coming from the east and going stratight
+ * etc...
+ */
+int will_collide(travel_directions a, travel_directions b) {
+    if (a == NL && (b == SS || b == SR || b == ES || b == EL || b == WS || b == WL))
+        return 1;
+    if (a == NR && (b == SL || b == ES))
+        return 1;
+    if (a == NS && (b == SL || b == ES || b == EL || b == WS || b == WR || b == WL))
+        return 1;
+    if (a == EL && (b == SS || b == SL || b == NS || b == NL || b == WR || b == WS))
+        return 1;
+    if (a == ER && (b == SS || b == WL))
+        return 1;
+    if (a == ES && (b == SS || b == SL || b == NL || b == NR || b == NS || b == WL))
+        return 1;
+    if (a == SL && (b == ES || b == EL || b == NR || b == NS || b == WL || b == WS))
+        return 1;
+    if (a == SR && (b == WS || b == NL))
+        return 1;
+    if (a == SS && (b == NL || b == ES || b == EL || b == ER || b == WS || b == WL))
+        return 1;
+    if (a == WL && (b == NS || b == NL || b == SS || b == SL || b == ES || b == ER))
+        return 1;
+    if (a == WR && (b == EL || b == NS))
+        return 1;
+    if (a == WS && (b == SS || b == SL || b == SR || b == EL || b == NS || b == NL))
+        return 1;
+    return 0;
+}
+
+void autonomous_traffic_intersection_eventhandler(intersection_state* SV, tw_bf* CV, message_data* M, tw_lp* LP) {
+    // Time warp starting time:
+    tw_stime ts = 0.0;
+    
+    // Current event:
+    tw_event* current_event = NULL;
+
+    // New message data:
+    message_data* new_message = NULL;
+
+    // Unknown time warp bit field:
+    *(int*) CV = (int) 0;
+    
+    // Handle the events defined in the "events" enumeration:
+    switch(M->event_type) {
+
+    case CARS_GO:
+        int i;
+        car_type cars[4 * MAX_LANES_PER_DIRECTION][4 * MAX_LANES_PER_DIRECTION];
+        for (i = 0; i < MAX_LANES_PER_DIRECTION; i++) {
+            SV->north_lanes[i]
+        }
+                    
+    case CAR_ARRIVES:
+            
+        // follows the y path first
+        if(M->car.y_to_go > 0) {
+            M->car.y_to_go--;
+            LP->gid = cell_compute_move(LP->gid, NORTH);
+        }
+        else if(M->car.y_to_go < 0) {
+            M->car.y_to_go++;
+            LP->gid = cell_compute_move(LP->gid, SOUTH);
+        }
+        // once y is 0, follows x path
+        else if(M->car.x_to_go > 0) {
+            M->car.x_to_go--;
+            LP->gid = cell_compute_move(LP->gid, EAST);
+        }
+        else if(M->car.x_to_go < 0) {
+            M->car.x_to_go++;
+            LP->gid = cell_compute_move(LP->gid, WEST);
+        }
+
+        current_event = tw_event_new(LP->gid, ts, LP);
+        new_message = (message_data*) tw_event_data(current_event);
+        new_message->car.x_to_go = M->car.x_to_go;
+        new_message->car.y_to_go = M->car.y_to_go;
+        new_message->car.start_time = M->car.start_time;
+        new_message->car.end_time = M->car.end_time;
+        new_message->event_type = CAR_ARRIVES;
+        tw_event_send(current_event);
+        
+        break;
+    }
+}
