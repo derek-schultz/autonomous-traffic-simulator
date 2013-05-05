@@ -24,12 +24,16 @@
 #define MAP_WIDTH 128
 #define MAP_HEIGHT 128
 
-// Ask Jeremy what these are
 #define NUM_VP_X 32
 #define NUM_VP_Y 32
 
-// Maximum number of cars allowed on a lane:
-#define MAX_CARS 30
+#define GREEN_LIGHT_DURATION 20
+#define LEFT_TURN_LIGHT_DURATION 10
+#define CAR_ACCELERATION_DELAY 1.0
+#define INITIAL_ARRIVAL_MEAN 100
+#define MINIMUM_TRAVEL_TIME 60
+#define TRAVEL_TIME_VARIATION 10
+#define MAX_TRAVEL_DISTANCE 100
 
 /** END DEFINES BLOCK **/
 
@@ -39,43 +43,45 @@
  */
 
 // VPs per PE?
-tw_lpid g_vp_per_proc = 0; // set in main
+extern tw_lpid g_vp_per_proc; // set in main
 
 // LPs per PE?
-tw_lpid g_cells_per_vp_x = MAP_WIDTH / NUM_VP_X;
-tw_lpid g_cells_per_vp_y = MAP_HEIGHT / NUM_VP_Y;
-tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
+extern tw_lpid g_cells_per_vp_x;
+extern tw_lpid g_cells_per_vp_y;
+extern tw_lpid g_cells_per_vp;
 
 // Average service time?
-tw_stime g_mean_service = 1.0;
+extern tw_stime g_mean_service;
 
 // QUESTION: lookahead?
-tw_stime g_lookahead = 20.0;
+extern tw_stime g_lookahead;
+
+extern tw_stime g_full_cycle_duration;
 
 // QUESTION: mult?
 // Why are all these static?
-static tw_stime g_mult = 1.6;
+extern tw_stime g_mult;
 
 // Number of LPs per PE
-static unsigned int g_nlp_per_pe = 8;
+extern unsigned int g_nlp_per_pe;
 
 // TODO: figure out what this means
-static int g_traffic_start_events = 15;
+extern int g_traffic_start_events;
 
 // TODO: figure out what this means
-static int g_optimistic_memory = 65536; // 64 KB
+extern int g_optimistic_memory; 
 
 // rate for timestamp exponential distribution
-static tw_stime g_mean = 1.0;
+extern tw_stime g_mean;
 
 // Holds the total cars initiated and completed for statistics
-static unsigned long long g_total_cars = 0;
-static unsigned long long g_cars_finished = 0;
-static unsigned long long int g_total_time = 0;
-static unsigned long long int g_average_time = 0;
+extern unsigned long long g_total_cars;
+extern unsigned long long g_cars_finished;
+extern unsigned long long g_total_time;
+extern unsigned long long g_average_time;
 
-tw_lpid num_cells_per_kp = 0;
-tw_lpid vp_per_proc = 0;
+extern tw_lpid num_cells_per_kp;
+extern tw_lpid vp_per_proc;
 
 /* END GLOBALS */
 
@@ -85,14 +91,17 @@ unsigned int autonomous;
 /****************************************** ENUMS ****************************/
 
 // Events enumeration:
-enum events { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
+enum event { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
 
 // Traffic lights enumeration:
-enum light_colors { RED, GREEN };
+enum light_color { RED, GREEN };
 
 // Directions to determine which way traffic is permitted in an intersection:
-enum intersection_directions { NORTH_SOUTH, EAST_WEST };
-enum cardinal_directions { WEST, EAST, SOUTH, NORTH };
+enum intersection_direction { NORTH_SOUTH, NORTH_SOUTH_LEFT,
+                              EAST_WEST,   EAST_WEST_LEFT };
+enum intersection_position { WEST, WEST_LEFT, EAST, EAST_LEFT,
+                             SOUTH, SOUTH_LEFT, NORTH, NORTH_LEFT };
+enum travel_direction { NL, NR, NS, EL, ER, ES, SL, SR, SS, WL, WR, WS };
 
 /**************************************** END ENUMS BLOCK ********************/
 
@@ -110,41 +119,27 @@ typedef struct {
 	
 	int x_to_go_original;
     int y_to_go_original;
+
+    enum intersection_position position;
     
-	//int has_turned_yet;
+	int has_turned;
 	
-	// Variable to hold the next intersection:
-	tw_lpid next_intersection;
-
-	// Variable to hold the past intersection this car was in:
-	//tw_lpid past_intersection;
-
 } car_type;
 
 // Message repesentation:
 typedef struct {
     // Enumeration for events:
-    enum events event_type;
+    enum event event_type;
+    
     // Struct to hold the car this message is referring to:
     car_type car;
+
+    // We need to save light timing information so we can reverse it
+    tw_stime saved_green_until;
+
 } message_data;
 
-// Representation of a lane:
-/*
-typedef struct {
-
-    // Number of cars in this lane:
-    // car_type cars[30];
-
-    // Number of cars in this lane:
-    int number_of_cars;
-
-    // The traffic light color for this lane:
-    enum light_colors light;
-
-} lane_type;*/
-
-// Representation of a 3-lane intersection:
+// Representation of an intersection:
 typedef struct {
 
     // Number of cars arrived at this intersection:
@@ -153,66 +148,70 @@ typedef struct {
     int total_cars_finished;
 
 	// Number of cars arriving in each direction:
-	int num_cars_in_south;
-	int num_cars_in_west;
-	int num_cars_in_north;
-	int num_cars_in_east;
+	int num_cars_south;
+	int num_cars_west;
+	int num_cars_north;
+	int num_cars_east;
 
-	// Number of cars leaving in each direction:
-	int num_cars_out_south;
-	int num_cars_out_west;
-	int num_cars_out_north;
-	int num_cars_out_east;
-
-    // Four arrays to represent the number of lanes in each 4-way intersection:
-    //lane_type north_lanes[MAX_LANES_PER_DIRECTION];
-    //lane_type south_lanes[MAX_LANES_PER_DIRECTION];
-    //lane_type west_lanes[MAX_LANES_PER_DIRECTION];
-    //lane_type east_lanes[MAX_LANES_PER_DIRECTION];
-
-    // Number of lanes for each direction:
-	/*
-    int number_of_north_lanes;
-    int number_of_south_lanes;
-    int number_of_west_lanes;
-    int number_of_east_lanes;
-	*/
+    int num_cars_south_left;
+    int num_cars_west_left;
+    int num_cars_north_left;
+    int num_cars_east_left;
     
-    // Describes whether a direction will get a green arrow:
-    //int has_turning_arrow;
-
-    // Variable to hold the time remaining on the intersection:
-    int time_remaining;
-
-    // Variable to hold the total time that this light waits:
-    int total_time;
-
-    // Variable to hold the total time for a left-turn arrow:
-    int left_total_time;
+    // Variables to hold the timing of the lights
+    tw_stime north_south_green_until;
+    tw_stime north_south_left_green_until;
+    tw_stime east_west_green_until;
+    tw_stime east_west_left_green_until;
 
     // Variable to hold the direction the lights are going:
-    enum intersection_directions traffic_direction;
+    enum intersection_direction traffic_direction;
 } intersection_state;
 
 /** END STRUCTS BLOCK **/
 
 /**********************************FUNCTION PROTOTYPES************************/
 
-// Initialization of an intersection:
-void intersection_startup(intersection_state*, tw_lp*);
+// With the old traffic lights
 
-// Event handler for an intersection:
-void intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+void traffic_light_intersection_startup(intersection_state*, tw_lp*);
 
-// Reverse event handler for an intersection:
-void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
-// Temp
-//void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
+void traffic_light_intersection_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
+
+void traffic_light_intersection_reverse_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
+
+// With communicating autonomous vehicles
+
+int will_collide(enum travel_direction, enum travel_direction);
+
+void autonomous_traffic_intersection_startup(intersection_state*, tw_lp*);
+
+void autonomous_traffic_intersection_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
+
+void autonomous_traffic_intersection_reverse_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
 
 // Function to collection statistics for an intersection:
 void intersection_statistics_collectstats(intersection_state*, tw_lp*);
-// Temp
-//void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
