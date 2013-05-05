@@ -55,13 +55,30 @@ void traffic_light_intersection_startup(intersection_state* SV, tw_lp* LP) {
         new_message = (message_data*)tw_event_data(current_event);
 
         new_message->event_type = CAR_ARRIVES;
+
+        assign_rand_dest:
         new_message->car.x_to_go = tw_rand_integer(LP->rng, -MAX_TRAVEL_DISTANCE, MAX_TRAVEL_DISTANCE);
         new_message->car.y_to_go = tw_rand_integer(LP->rng, -MAX_TRAVEL_DISTANCE, MAX_TRAVEL_DISTANCE);
         new_message->car.x_to_go_original = new_message->car.x_to_go;
         new_message->car.y_to_go_original = new_message->car.y_to_go;
         new_message->car.has_turned = 0;
         new_message->car.start_time = tw_now(LP);
-        
+        if (new_message->car.y_to_go > 0) {
+            new_message->car.position = SOUTH;
+        } else if (new_message->car.y_to_go < 0) {
+            new_message->car.position = NORTH;
+        } else if (new_message->car.y_to_go == 0) {
+            new_message->car.has_turned = 1;
+            if (new_message->car.x_to_go > 0) {
+                new_message->car.position = EAST;
+            } else if (new_message->car.x_to_go < 0) {
+                new_message->car.position = WEST;
+            } else {
+                // Already there?? not acceptible...
+                goto assign_rand_dest
+            }
+        }
+
         tw_event_send(current_event);
     }
 }
@@ -102,12 +119,12 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
                 SV->north_south_next_green = tw_now(lp) + g_full_cycle_duration;
 
                 // Schedule the next light change
-                ts = LEFT_TURN_LIGHT_DURATION;
+                ts = GREEN_LIGHT_DURATION;
 
             }
             else if(SV->traffic_direction == NORTH_SOUTH) {
                 
-                // Switch permitted traffic to EAST_WEST:
+                // Switch permitted traffic to EAST_WEST_LEFT:
                 SV->traffic_direction = EAST_WEST_LEFT;
 
                 // Update the timers on the lights
@@ -116,7 +133,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
                 SV->east_west_left_next_green = tw_now(lp) + g_full_cycle_duration;
 
                 // Schedule the next light change
-                ts = GREEN_LIGHT_DURATION;
+                ts = LEFT_TURN_LIGHT_DURATION;
 
             } else if (SV->traffic_direction == EAST_WEST_LEFT) {
 
@@ -129,28 +146,28 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
                 SV->east_west_next_green = tw_now(lp) + g_full_cycle_duration;
 
                 // Schedule the next light change
-                ts = LEFT_TURN_LIGHT_DURATION;
+                ts = GREEN_LIGHT_DURATION;
 
             } else if (SV->traffic_direction == EAST_WEST) {
 
-                // Switch permitted traffic to EAST_WEST:
+                // Switch permitted traffic to NORTH_SOUTH_LEFT:
                 SV->traffic_direction = NORTH_SOUTH_LEFT;
 
                 // Update the timers on the lights
-                SV->east_west_last_green = SV->east_west_green_until;
-                SV->east_west_green_until = tw_now(lp) + LEFT_TURN_LIGHT_DURATION;
-                SV->east_west_next_green = tw_now(lp) + g_full_cycle_duration;
+                SV->north_south_left_last_green = SV->north_south_left_green_until;
+                SV->north_south_left_green_until = tw_now(lp) + LEFT_TURN_LIGHT_DURATION;
+                SV->north_south_left_next_green = tw_now(lp) + g_full_cycle_duration;
 
                 // Schedule the next light change
-                ts = GREEN_LIGHT_DURATION;
+                ts = LEFT_TURN_LIGHT_DURATION;
 
             }
 
             // Send the next light change event
-            light_event = tw_event_new(lp->gid, ts, lp);
-            message = (message_data*)tw_event_data(light_event);
-            NewM->event_type = LIGHT_CHANGE;
-            tw_event_send(light_event);
+            current_event = tw_event_new(lp->gid, ts, lp);
+            new_message = (message_data*)tw_event_data(current_event);
+            new_message->event_type = LIGHT_CHANGE;
+            tw_event_send(current_event);
 
             break;
             

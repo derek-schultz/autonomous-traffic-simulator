@@ -50,13 +50,10 @@ const tw_optdef model_opts[] = {
 // Main Function:
 int main(int argc, char* argv[]) {
     // QUESTION: I don't know what this is or why it is set so low
-    g_tw_ts_end = 30; // ROSS default is 100000.0
+    g_tw_ts_end = 10000; // ROSS default is 100000.0
     g_tw_gvt_interval = 512; // ROSS default is 16
     g_tw_mblock = 8; // ROSS default to 16
     
-    // QUESTION: Jeremy says this is necessary if compiled with MEMORY queues
-    g_tw_memory_nqueues = 1;
-
     tw_opt_add(model_opts);
     tw_init(&argc, &argv);
 
@@ -65,9 +62,6 @@ int main(int argc, char* argv[]) {
 
     // Reset mean based on lookahead. QUESTION: why?
     g_mean = g_mean - g_lookahead;
-
-    // QUESTION: this was 1 before...
-    g_tw_memory_nqueues = 16; // give at least 16 memory queue event
 
     // Set lookahead
     g_tw_lookahead = g_lookahead;
