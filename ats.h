@@ -34,6 +34,10 @@
 // Maximum number of lanes per direction:
 #define MAX_LANES_PER_DIRECTION 3
 
+#define GREEN_LIGHT_DURATION 20
+#define LEFT_TURN_LIGHT_DURATION 10
+#define CAR_ACCELERATION_DELAY 1.0
+
 /** END DEFINES BLOCK **/
 
 /*
@@ -54,6 +58,8 @@ tw_stime g_mean_service = 1.0;
 
 // QUESTION: lookahead?
 tw_stime g_lookahead = 20.0;
+
+g_full_cycle_duration = 2*LEFT_TURN_LIGHT_DURATION + 2*GREEN_LIGHT_DURATION;
 
 // QUESTION: mult?
 // Why are all these static?
@@ -88,15 +94,17 @@ unsigned int autonomous;
 /****************************************** ENUMS ****************************/
 
 // Events enumeration:
-enum events { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
+enum event { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
 
 // Traffic lights enumeration:
-enum light_colors { RED, GREEN };
+enum light_color { RED, GREEN };
 
 // Directions to determine which way traffic is permitted in an intersection:
-enum intersection_directions { NORTH_SOUTH, EAST_WEST };
-enum cardinal_directions { WEST, EAST, SOUTH, NORTH };
-enum travel_directions { NL, NR, NS, EL, ER, ES, SL, SR, SS, WL, WR, WS };
+enum intersection_direction { NORTH_SOUTH, NORTH_SOUTH_LEFT,
+                              EAST_WEST,   EAST_WEST_LEFT };
+enum intersection_position { WEST, WEST_LEFT, EAST, EAST_LEFT,
+                             SOUTH, SOUTH_LEFT, NORTH, NORTH_LEFT };
+enum travel_direction { NL, NR, NS, EL, ER, ES, SL, SR, SS, WL, WR, WS };
 
 /**************************************** END ENUMS BLOCK ********************/
 
@@ -114,12 +122,11 @@ typedef struct {
 	
 	int x_to_go_original;
     int y_to_go_original;
+
+    intersection_position position;
     
 	//int has_turned_yet;
 	
-	// Variable to hold the next intersection:
-	tw_lpid next_intersection;
-
 	// Variable to hold the past intersection this car was in:
 	//tw_lpid past_intersection;
 
@@ -133,21 +140,6 @@ typedef struct {
     car_type car;
 } message_data;
 
-// Representation of a lane:
-/*
-typedef struct {
-
-    // Number of cars in this lane:
-    // car_type cars[30];
-
-    // Number of cars in this lane:
-    int number_of_cars;
-
-    // The traffic light color for this lane:
-    enum light_colors light;
-
-} lane_type;*/
-
 // Representation of a 3-lane intersection:
 typedef struct {
 
@@ -157,36 +149,43 @@ typedef struct {
     int total_cars_finished;
 
 	// Number of cars arriving in each direction:
-	int num_cars_in_south;
-	int num_cars_in_west;
-	int num_cars_in_north;
-	int num_cars_in_east;
+	int num_cars_south;
+	int num_cars_west;
+	int num_cars_north;
+	int num_cars_east;
+
+    int num_cars_south_left;
+    int num_cars_west_left;
+    int num_cars_north_left;
+    int num_cars_east_left;
+
+    int num_cars_total;
 
 	// Number of cars leaving in each direction:
 	int num_cars_out_south;
 	int num_cars_out_west;
 	int num_cars_out_north;
 	int num_cars_out_east;
-
-    // Four arrays to represent the number of lanes in each 4-way intersection:
-    //lane_type north_lanes[MAX_LANES_PER_DIRECTION];
-    //lane_type south_lanes[MAX_LANES_PER_DIRECTION];
-    //lane_type west_lanes[MAX_LANES_PER_DIRECTION];
-    //lane_type east_lanes[MAX_LANES_PER_DIRECTION];
-
-    // Number of lanes for each direction:
-	/*
-    int number_of_north_lanes;
-    int number_of_south_lanes;
-    int number_of_west_lanes;
-    int number_of_east_lanes;
-	*/
     
     // Describes whether a direction will get a green arrow:
     //int has_turning_arrow;
 
     // Variable to hold the time remaining on the intersection:
-    int time_remaining;
+    int north_south_last_green;
+    int north_south_green_until;
+    int north_south_next_green;
+
+    int north_south_left_last_green;
+    int north_south_left_green_until;
+    int north_south_left_next_green;
+
+    int east_west_last_green;
+    int east_west_green_until;
+    int east_west_next_green;
+
+    int east_west_left_last_green;
+    int east_west_left_green_until;
+    int east_west_left_next_green;
 
     // Variable to hold the total time that this light waits:
     int total_time;
