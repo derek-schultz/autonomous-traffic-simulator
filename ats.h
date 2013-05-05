@@ -24,19 +24,17 @@
 #define MAP_WIDTH 64
 #define MAP_HEIGHT 64
 
-// Ask Jeremy what these are
 #define NUM_VP_X 32
 #define NUM_VP_Y 32
-
-// Maximum number of cars allowed on a lane:
-#define MAX_CARS 30
-
-// Maximum number of lanes per direction:
-#define MAX_LANES_PER_DIRECTION 3
 
 #define GREEN_LIGHT_DURATION 20
 #define LEFT_TURN_LIGHT_DURATION 10
 #define CAR_ACCELERATION_DELAY 1.0
+#define INITIAL_ARRIVAL_MEAN 10
+#define MINIMUM_TRAVEL_TIME 60
+#define TRAVEL_TIME_VARIATION 10
+
+#define MAX_TRAVEL_DISTANCE 100
 
 /** END DEFINES BLOCK **/
 
@@ -125,11 +123,8 @@ typedef struct {
 
     intersection_position position;
     
-	//int has_turned_yet;
+	int has_turned;
 	
-	// Variable to hold the past intersection this car was in:
-	//tw_lpid past_intersection;
-
 } car_type;
 
 // Message repesentation:
@@ -140,7 +135,7 @@ typedef struct {
     car_type car;
 } message_data;
 
-// Representation of a 3-lane intersection:
+// Representation of an intersection:
 typedef struct {
 
     // Number of cars arrived at this intersection:
@@ -158,19 +153,8 @@ typedef struct {
     int num_cars_west_left;
     int num_cars_north_left;
     int num_cars_east_left;
-
-    int num_cars_total;
-
-	// Number of cars leaving in each direction:
-	int num_cars_out_south;
-	int num_cars_out_west;
-	int num_cars_out_north;
-	int num_cars_out_east;
     
-    // Describes whether a direction will get a green arrow:
-    //int has_turning_arrow;
-
-    // Variable to hold the time remaining on the intersection:
+    // Variables to hold the timing of the lights
     int north_south_last_green;
     int north_south_green_until;
     int north_south_next_green;
@@ -187,14 +171,8 @@ typedef struct {
     int east_west_left_green_until;
     int east_west_left_next_green;
 
-    // Variable to hold the total time that this light waits:
-    int total_time;
-
-    // Variable to hold the total time for a left-turn arrow:
-    int left_total_time;
-
     // Variable to hold the direction the lights are going:
-    enum intersection_directions traffic_direction;
+    enum intersection_direction traffic_direction;
 } intersection_state;
 
 /** END STRUCTS BLOCK **/
