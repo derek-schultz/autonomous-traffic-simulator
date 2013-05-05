@@ -21,8 +21,8 @@
 /** DEFINES **/
 
 // Number of cells in the grid (default is 64 x 64 grid):
-#define MAP_WIDTH 64
-#define MAP_HEIGHT 64
+#define MAP_WIDTH 128
+#define MAP_HEIGHT 128
 
 // Ask Jeremy what these are
 #define NUM_VP_X 32
@@ -30,9 +30,6 @@
 
 // Maximum number of cars allowed on a lane:
 #define MAX_CARS 30
-
-// Maximum number of lanes per direction:
-#define MAX_LANES_PER_DIRECTION 3
 
 /** END DEFINES BLOCK **/
 
@@ -74,8 +71,8 @@ static tw_stime g_mean = 1.0;
 // Holds the total cars initiated and completed for statistics
 static unsigned long long g_total_cars = 0;
 static unsigned long long g_cars_finished = 0;
-static unsigned long long g_total_time = 0;
-static unsigned long long g_average_time = 0;
+static unsigned long long int g_total_time = 0;
+static unsigned long long int g_average_time = 0;
 
 tw_lpid num_cells_per_kp = 0;
 tw_lpid vp_per_proc = 0;
