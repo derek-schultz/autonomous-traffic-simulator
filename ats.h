@@ -131,8 +131,13 @@ typedef struct {
 typedef struct {
     // Enumeration for events:
     enum events event_type;
+    
     // Struct to hold the car this message is referring to:
     car_type car;
+
+    // We need to save light timing information so we can reverse it
+    tw_stime saved_green_until;
+
 } message_data;
 
 // Representation of an intersection:
@@ -155,21 +160,10 @@ typedef struct {
     int num_cars_east_left;
     
     // Variables to hold the timing of the lights
-    int north_south_last_green;
-    int north_south_green_until;
-    int north_south_next_green;
-
-    int north_south_left_last_green;
-    int north_south_left_green_until;
-    int north_south_left_next_green;
-
-    int east_west_last_green;
-    int east_west_green_until;
-    int east_west_next_green;
-
-    int east_west_left_last_green;
-    int east_west_left_green_until;
-    int east_west_left_next_green;
+    tw_stime north_south_green_until;
+    tw_stime north_south_left_green_until;
+    tw_stime east_west_green_until;
+    tw_stime east_west_left_green_until;
 
     // Variable to hold the direction the lights are going:
     enum intersection_direction traffic_direction;
