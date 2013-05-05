@@ -14,6 +14,47 @@
 
 #include "ats.h"
 
+// VPs per PE?
+tw_lpid g_vp_per_proc = 0; // set in main
+
+// LPs per PE?
+tw_lpid g_cells_per_vp_x = MAP_WIDTH / NUM_VP_X;
+tw_lpid g_cells_per_vp_y = MAP_HEIGHT / NUM_VP_Y;
+tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
+
+// Average service time?
+tw_stime g_mean_service = 1.0;
+
+// QUESTION: lookahead?
+tw_stime g_lookahead = 1.0;
+
+tw_stime g_full_cycle_duration = 2*LEFT_TURN_LIGHT_DURATION + 2*GREEN_LIGHT_DURATION;
+
+// QUESTION: mult?
+// Why are all these static?
+tw_stime g_mult = 1.6;
+
+// Number of LPs per PE
+unsigned int g_nlp_per_pe = 8;
+
+// TODO: figure out what this means
+int g_traffic_start_events = 15;
+
+// TODO: figure out what this means
+int g_optimistic_memory = 65536; // 64 KB
+
+// rate for timestamp exponential distribution
+tw_stime g_mean = 1.0;
+
+// Holds the total cars initiated and completed for statistics
+unsigned long long g_total_cars = 0;
+unsigned long long g_cars_finished = 0;
+unsigned long long g_total_time = 0;
+unsigned long long g_average_time = 0;
+
+tw_lpid num_cells_per_kp = 0;
+tw_lpid vp_per_proc = 0;
+
 // Function roles:
 tw_lptype traffic_light_lps[] = {
     {
@@ -175,7 +216,7 @@ void traffic_grid_mapping() {
                 local_lp_count++;
 
                 if (kpid >= g_tw_nkp)
-                    tw_error(TW_LOC, "Attempting to mapping a KPid (%llu) for
+                    tw_error(TW_LOC, "Attempting to mapping a KPid (%llu) for \
                         Global LPid %llu that is beyond g_tw_nkp (%llu)\n",
                         kpid, lpid, g_tw_nkp );
 
@@ -187,8 +228,12 @@ void traffic_grid_mapping() {
 
                 tw_lp_onkp(g_tw_lp[cell_mapping_to_local_index(lpid)],
                            g_tw_kp[kpid]);
-                tw_lp_settype(cell_mapping_to_local_index(lpid),
-                                                          &traffic_lps[0]);
+                if (autonomous)
+                    tw_lp_settype(cell_mapping_to_local_index(lpid),
+                                  &autonomous_traffic_lps[0]);
+                else
+                    tw_lp_settype(cell_mapping_to_local_index(lpid),
+                                  &traffic_light_lps[0]);
             }
         }
     }

@@ -44,45 +44,45 @@
  */
 
 // VPs per PE?
-tw_lpid g_vp_per_proc = 0; // set in main
+extern tw_lpid g_vp_per_proc; // set in main
 
 // LPs per PE?
-tw_lpid g_cells_per_vp_x = MAP_WIDTH / NUM_VP_X;
-tw_lpid g_cells_per_vp_y = MAP_HEIGHT / NUM_VP_Y;
-tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
+extern tw_lpid g_cells_per_vp_x;
+extern tw_lpid g_cells_per_vp_y;
+extern tw_lpid g_cells_per_vp;
 
 // Average service time?
-tw_stime g_mean_service = 1.0;
+extern tw_stime g_mean_service;
 
 // QUESTION: lookahead?
-tw_stime g_lookahead = 20.0;
+extern tw_stime g_lookahead;
 
-g_full_cycle_duration = 2*LEFT_TURN_LIGHT_DURATION + 2*GREEN_LIGHT_DURATION;
+extern tw_stime g_full_cycle_duration;
 
 // QUESTION: mult?
 // Why are all these static?
-static tw_stime g_mult = 1.6;
+extern tw_stime g_mult;
 
 // Number of LPs per PE
-static unsigned int g_nlp_per_pe = 8;
+extern unsigned int g_nlp_per_pe;
 
 // TODO: figure out what this means
-static int g_traffic_start_events = 15;
+extern int g_traffic_start_events;
 
 // TODO: figure out what this means
-static int g_optimistic_memory = 65536; // 64 KB
+extern int g_optimistic_memory; 
 
 // rate for timestamp exponential distribution
-static tw_stime g_mean = 1.0;
+extern tw_stime g_mean;
 
 // Holds the total cars initiated and completed for statistics
-static unsigned long long g_total_cars = 0;
-static unsigned long long g_cars_finished = 0;
-static unsigned long long g_total_time = 0;
-static unsigned long long g_average_time = 0;
+extern unsigned long long g_total_cars;
+extern unsigned long long g_cars_finished;
+extern unsigned long long g_total_time;
+extern unsigned long long g_average_time;
 
-tw_lpid num_cells_per_kp = 0;
-tw_lpid vp_per_proc = 0;
+extern tw_lpid num_cells_per_kp;
+extern tw_lpid vp_per_proc;
 
 /* END GLOBALS */
 
@@ -121,7 +121,7 @@ typedef struct {
 	int x_to_go_original;
     int y_to_go_original;
 
-    intersection_position position;
+    enum intersection_position position;
     
 	int has_turned;
 	
@@ -130,7 +130,7 @@ typedef struct {
 // Message repesentation:
 typedef struct {
     // Enumeration for events:
-    enum events event_type;
+    enum event event_type;
     
     // Struct to hold the car this message is referring to:
     car_type car;
@@ -192,6 +192,8 @@ void traffic_light_intersection_reverse_eventhandler(
 );
 
 // With communicating autonomous vehicles
+
+int will_collide(enum travel_direction, enum travel_direction);
 
 void autonomous_traffic_intersection_startup(intersection_state*, tw_lp*);
 

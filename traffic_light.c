@@ -20,30 +20,19 @@ void traffic_light_intersection_startup(intersection_state* SV, tw_lp* LP) {
     SV->num_cars_north_left = 0;
     SV->num_cars_east_left = 0;
 
-    SV->north_south_last_green = -1;
     SV->north_south_green_until = -1;
-    SV->north_south_next_green = -1;
-
-    SV->north_south_left_last_green = -1;
     SV->north_south_left_green_until = -1;
-    SV->north_south_left_next_green = -1;
-
-    SV->east_west_last_green = -1;
     SV->east_west_green_until = -1;
-    SV->east_west_next_green = -1;
-
-    SV->east_west_left_last_green = -1;
     SV->east_west_left_green_until = -1;
-    SV->east_west_left_next_green = -1;
 
     // Initialize a random direction to be green
     SV->traffic_direction = tw_rand_ulong(LP->rng, NORTH_SOUTH, EAST_WEST_LEFT);
 
     // Schedule the first light change
-    light_event = tw_event_new(lp->gid, ts, lp);
-    message = (message_data*)tw_event_data(light_event);
-    message->event_type = LIGHT_CHANGE;
-    tw_event_send(light_event);
+    current_event = tw_event_new(LP->gid, ts, LP);
+    new_message = (message_data*)tw_event_data(current_event);
+    new_message->event_type = LIGHT_CHANGE;
+    tw_event_send(current_event);
 
     // Put cars on the road
     int i;
@@ -80,6 +69,8 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 
     // Save a copy
     tw_stime saved_green_until;
+
+    tw_stime light_green_until;
     
     // Current event:
     tw_event* current_event = NULL;
@@ -89,6 +80,9 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 
     // Unknown time warp bit field:
     *(int*) CV = (int) 0;
+
+    tw_lpid next_intersection;
+    tw_stime queue_wait_time;
     
     // Handle the events defined in the "events" enumeration:
     switch(M->event_type) {
@@ -105,7 +99,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
             SV->traffic_direction = NORTH_SOUTH;
 
             // Update the timers on the lights
-            SV->north_south_green_until = tw_now(lp) + LEFT_TURN_LIGHT_DURATION;
+            SV->north_south_green_until = tw_now(LP) + LEFT_TURN_LIGHT_DURATION;
             saved_green_until = SV->north_south_green_until;
 
             // Schedule the next light change
@@ -118,8 +112,8 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
             SV->traffic_direction = EAST_WEST_LEFT;
 
             // Update the timers on the lights
-            SV->east_west_left_green_until = tw_now(lp) + LEFT_TURN_LIGHT_DURATION;
-            saved_green_until = SV-east_west_left_green_until;
+            SV->east_west_left_green_until = tw_now(LP) + LEFT_TURN_LIGHT_DURATION;
+            saved_green_until = SV->east_west_left_green_until;
 
             // Schedule the next light change
             ts = LEFT_TURN_LIGHT_DURATION;
@@ -130,7 +124,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
             SV->traffic_direction = EAST_WEST;
 
             // Update the timers on the lights
-            SV->east_west_green_until = tw_now(lp) + LEFT_TURN_LIGHT_DURATION;
+            SV->east_west_green_until = tw_now(LP) + LEFT_TURN_LIGHT_DURATION;
             saved_green_until = SV->east_west_green_until;
 
             // Schedule the next light change
@@ -142,7 +136,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
             SV->traffic_direction = NORTH_SOUTH_LEFT;
 
             // Update the timers on the lights
-            SV->north_south_left_green_until = tw_now(lp) + LEFT_TURN_LIGHT_DURATION;
+            SV->north_south_left_green_until = tw_now(LP) + LEFT_TURN_LIGHT_DURATION;
             saved_green_until = SV->north_south_left_green_until;
 
             // Schedule the next light change
@@ -151,7 +145,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         }
 
         // Send the next light change event
-        current_event = tw_event_new(lp->gid, ts, lp);
+        current_event = tw_event_new(LP->gid, ts, LP);
         new_message = (message_data*)tw_event_data(current_event);
         new_message->event_type = LIGHT_CHANGE;
         new_message->saved_green_until = saved_green_until;
@@ -162,8 +156,6 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
     // Handle the case where the car arrives at an intersection:
     case CAR_ARRIVES:
 
-        tw_lpid next_intersection;
-        tw_stime queue_wait_time;
 
         // Car reached its destination:
         if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {
@@ -280,27 +272,35 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
 
         case NORTH:
             queue_wait_time = SV->num_cars_north * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->north_south_green_until;
             break;
         case NORTH_LEFT:
             queue_wait_time = SV->num_cars_north_left * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->north_south_left_green_until;
             break;
         case EAST:
             queue_wait_time = SV->num_cars_east * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->east_west_green_until;
             break;
         case EAST_LEFT:
             queue_wait_time = SV->num_cars_east_left * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->east_west_left_green_until;
             break;
         case SOUTH:
             queue_wait_time = SV->num_cars_south * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->north_south_green_until;
             break;
         case SOUTH_LEFT:
             queue_wait_time = SV->num_cars_south_left * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->north_south_left_green_until;
             break;
         case WEST:
             queue_wait_time = SV->num_cars_west * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->east_west_green_until;
             break;
         case WEST_LEFT:
             queue_wait_time = SV->num_cars_west_left * CAR_ACCELERATION_DELAY;
+            light_green_until = SV->east_west_left_green_until;
             break;
 
         }
@@ -308,7 +308,8 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         /* If the light is green and there aren't too many cars ahead
          * we can make it through right now! Schedule the next arrival */
         if (tw_now(LP) + queue_wait_time < light_green_until) {
-            ts = tw_rand_exponential(LP->rng, MEAN_TRAVEL_TIME);
+            ts = tw_rand_exponential(LP->rng, TRAVEL_TIME_VARIATION)
+                 + MINIMUM_TRAVEL_TIME;
         }
 
         /* If the light is red or there are too many cars ahead, we will
@@ -316,11 +317,13 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         else {
             if (M->car.position == NORTH || M->car.position == SOUTH ||
                 M->car.position == EAST  || M->car.position == WEST) {
-                ts = tw_rand_exponential(LP->rng, MEAN_TRAVEL_TIME)
+                ts = tw_rand_exponential(LP->rng, TRAVEL_TIME_VARIATION)
+                     + MINIMUM_TRAVEL_TIME
                      + (queue_wait_time / GREEN_LIGHT_DURATION)
                      * g_full_cycle_duration;
             } else {
-                ts = tw_rand_exponential(LP->rng, MEAN_TRAVEL_TIME)
+                ts = tw_rand_exponential(LP->rng, TRAVEL_TIME_VARIATION)
+                     + MINIMUM_TRAVEL_TIME
                      + (queue_wait_time / LEFT_TURN_LIGHT_DURATION)
                      * g_full_cycle_duration;
             }
@@ -332,7 +335,6 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         new_message->car.y_to_go = M->car.y_to_go;
         new_message->car.x_to_go_original = M->car.x_to_go_original;
         new_message->car.y_to_go_original = M->car.y_to_go_original;
-        new_message->car.next_intersection = M->car.next_intersection;
         new_message->car.start_time = M->car.start_time;
         new_message->car.end_time = M->car.end_time;
         new_message->event_type = CAR_ARRIVES;
@@ -349,6 +351,9 @@ void traffic_light_intersection_reverse_eventhandler(
         tw_bf* CV,
         message_data* M,
         tw_lp* LP) {
+
+    tw_lpid next_intersection;
+    tw_stime queue_wait_time;
 
     // Unknown time warp bit field:
     *(int*) CV = (int) 0;
@@ -374,7 +379,7 @@ void traffic_light_intersection_reverse_eventhandler(
             SV->traffic_direction = NORTH_SOUTH_LEFT;
 
             // Update the timers on the lights
-            SV->north_south_left_last_green = M->saved_green_until;
+            SV->north_south_left_green_until = M->saved_green_until;
 
         } else if (SV->traffic_direction == EAST_WEST_LEFT) {
 
@@ -382,7 +387,7 @@ void traffic_light_intersection_reverse_eventhandler(
             SV->traffic_direction = NORTH_SOUTH;
 
             // Update the timers on the lights
-            SV->north_south_last_green = M->saved_green_until;
+            SV->north_south_green_until = M->saved_green_until;
 
         } else if (SV->traffic_direction == EAST_WEST) {
 
@@ -390,16 +395,13 @@ void traffic_light_intersection_reverse_eventhandler(
             SV->traffic_direction = EAST_WEST_LEFT;
 
             // Update the timers on the lights
-            SV->east_west_left_last_green = M->saved_green_until;
+            SV->east_west_left_green_until = M->saved_green_until;
 
         }
 
         break;
     
     case CAR_ARRIVES:
-
-        tw_lpid next_intersection;
-        tw_stime queue_wait_time;
 
         // Car reached its destination:
         if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {

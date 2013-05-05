@@ -7,7 +7,7 @@
  * ES indicates that the car is coming from the east and going stratight
  * etc...
  */
-int will_collide(travel_directions a, travel_directions b) {
+int will_collide(enum travel_direction a, enum travel_direction b) {
     if (a == NL && (b == SS || b == SR || b == ES || b == EL || b == WS || b == WL))
         return 1;
     if (a == NR && (b == SL || b == ES))
@@ -37,7 +37,7 @@ int will_collide(travel_directions a, travel_directions b) {
 
 void autonomous_traffic_intersection_startup(intersection_state* SV,
                                              tw_lp* LP) {
-    tw_stime ts;
+    /*tw_stime ts;
     tw_event* current_event;
     message_data* new_message;
 
@@ -79,7 +79,7 @@ void autonomous_traffic_intersection_startup(intersection_state* SV,
         //new_message->car.has_turned_yet = 0;
         
         tw_event_send(current_event);
-    }
+    }*/
 }
 
 void autonomous_traffic_intersection_eventhandler(
@@ -87,7 +87,7 @@ void autonomous_traffic_intersection_eventhandler(
         tw_bf* CV,
         message_data* M,
         tw_lp* LP) {
-
+/*
     // Time warp starting time:
     tw_stime ts = 0.0;
     
@@ -133,7 +133,7 @@ void autonomous_traffic_intersection_eventhandler(
          * departure for this vehicle immediately. If there are already cars in
          * the intersection, organized departures are already cycling and the
          * car will be automatically dispatched when possible.
-         */
+         *//*
         if (SV->num_cars_total == 0) {
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
@@ -147,5 +147,12 @@ void autonomous_traffic_intersection_eventhandler(
 
         break;
     }
-
+*/
 }
+
+void autonomous_traffic_intersection_reverse_eventhandler(
+    intersection_state* SV,
+    tw_bf* BF,
+    message_data* M,
+    tw_lp* LP
+) { }
