@@ -46,8 +46,8 @@ int main(int argc, char* argv[]) {
     tw_opt_add(model_opts);
     tw_init(&argc, &argv);
 
-    if (g_lookahead > 1.0)
-        tw_error(TW_LOC, "Lookahead must be less than 1.0\n"); // QUESTION: why?
+    if (g_lookahead > 20.0)
+        tw_error(TW_LOC, "Lookahead must be less than 20.0\n"); // QUESTION: why?
 
     // Reset mean based on lookahead. QUESTION: why?
     g_mean = g_mean - g_lookahead;
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 
 	printf("Number of cars finised %lld\n", g_cars_finished);
 	printf("Number of cars that arrived %lld\n", g_total_cars);
-	printf("Average travel time %lld\n", g_average_time);
+	printf("Average travel time %llu\n", g_average_time);
 	
     return 0;
 } /** END FUNCTION main **/
@@ -252,6 +252,9 @@ void intersection_startup(intersection_state* SV, tw_lp* LP) {
 		new_message->car.x_to_go_original = new_message->car.x_to_go;
 		new_message->car.y_to_go_original = new_message->car.y_to_go;
         new_message->car.start_time = tw_clock_now(LP->pe);
+		
+		printf("Made car with x: %d  y: %d  time: %d\n", new_message->car.x_to_go, new_message->car.y_to_go,
+			   new_message->car.start_time);
 		//new_message->car.has_turned_yet = 0;
 		
         tw_event_send(current_event);
@@ -681,5 +684,6 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 void intersection_statistics_collectstats(intersection_state* SV, tw_lp* LP) {
 	g_total_cars += SV->total_cars_arrived;
 	g_cars_finished += SV->total_cars_finished;
-	g_average_time = g_total_time/g_cars_finished;
+	if(g_cars_finished > 0)
+		g_average_time = g_total_time/g_cars_finished;
 }
