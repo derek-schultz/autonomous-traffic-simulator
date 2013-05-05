@@ -53,7 +53,7 @@ tw_lpid g_cells_per_vp = (MAP_WIDTH / NUM_VP_X) * (MAP_HEIGHT / NUM_VP_Y);
 tw_stime g_mean_service = 1.0;
 
 // QUESTION: lookahead?
-tw_stime g_lookahead = 1.0;
+tw_stime g_lookahead = 20.0;
 
 // QUESTION: mult?
 // Why are all these static?
@@ -74,6 +74,8 @@ static tw_stime g_mean = 1.0;
 // Holds the total cars initiated and completed for statistics
 static unsigned long long g_total_cars = 0;
 static unsigned long long g_cars_finished = 0;
+static unsigned long long g_total_time = 0;
+static unsigned long long g_average_time = 0;
 
 tw_lpid num_cells_per_kp = 0;
 tw_lpid vp_per_proc = 0;
@@ -109,8 +111,18 @@ typedef struct {
     // Variables to hold the destination's X and Y coordinates:
     int x_to_go;
     int y_to_go;
-    // Enumeration to hold the current direction:
-    //enum directions current_direction;
+	
+	int x_to_go_original;
+    int y_to_go_original;
+    
+	//int has_turned_yet;
+	
+	// Variable to hold the next intersection:
+	tw_lpid next_intersection;
+
+	// Variable to hold the past intersection this car was in:
+	//tw_lpid past_intersection;
+
 } car_type;
 
 // Message repesentation:
@@ -122,10 +134,11 @@ typedef struct {
 } message_data;
 
 // Representation of a lane:
+/*
 typedef struct {
 
     // Number of cars in this lane:
-    car_type cars[30];
+    // car_type cars[30];
 
     // Number of cars in this lane:
     int number_of_cars;
@@ -133,9 +146,9 @@ typedef struct {
     // The traffic light color for this lane:
     enum light_colors light;
 
-} lane_type;
+} lane_type;*/
 
-// Representation of an intersection:
+// Representation of a 3-lane intersection:
 typedef struct {
 
     // Number of cars arrived at this intersection:
@@ -143,20 +156,34 @@ typedef struct {
     // Number of cars finished at this intersection:
     int total_cars_finished;
 
+	// Number of cars arriving in each direction:
+	int num_cars_in_south;
+	int num_cars_in_west;
+	int num_cars_in_north;
+	int num_cars_in_east;
+
+	// Number of cars leaving in each direction:
+	int num_cars_out_south;
+	int num_cars_out_west;
+	int num_cars_out_north;
+	int num_cars_out_east;
+
     // Four arrays to represent the number of lanes in each 4-way intersection:
-    lane_type north_lanes[MAX_LANES_PER_DIRECTION];
-    lane_type south_lanes[MAX_LANES_PER_DIRECTION];
-    lane_type west_lanes[MAX_LANES_PER_DIRECTION];
-    lane_type east_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type north_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type south_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type west_lanes[MAX_LANES_PER_DIRECTION];
+    //lane_type east_lanes[MAX_LANES_PER_DIRECTION];
 
     // Number of lanes for each direction:
+	/*
     int number_of_north_lanes;
     int number_of_south_lanes;
     int number_of_west_lanes;
     int number_of_east_lanes;
+	*/
     
     // Describes whether a direction will get a green arrow:
-    int has_green_arrow;
+    //int has_turning_arrow;
 
     // Variable to hold the time remaining on the intersection:
     int time_remaining;
@@ -187,12 +214,12 @@ void autonomous_traffic_intersection_eventhandler(intersection_state*, tw_bf*, m
 // Reverse event handler for an intersection:
 void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
 // Temp
-void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
+//void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
 
 // Function to collection statistics for an intersection:
 void intersection_statistics_collectstats(intersection_state*, tw_lp*);
 // Temp
-void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
+//void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
