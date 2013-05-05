@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES(${ROSS_SOURCE_DIR})
 
-SET(ats_srcs
-ats.c      ats.h)
+SET(ats_srcs 
+    ats.c autonomous_traffic.c traffic_light.c ats.h)
 
 ADD_EXECUTABLE(ats ${ats_srcs})
 

@@ -202,24 +202,44 @@ typedef struct {
 
 /**********************************FUNCTION PROTOTYPES************************/
 
-// Initialization of an intersection:
-void intersection_startup(intersection_state*, tw_lp*);
+// With the old traffic lights
 
-// Event handler for an intersection (with the old traffic lights)
-void traffic_light_intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+void traffic_light_intersection_startup(intersection_state*, tw_lp*);
 
-// Event handler for an intersection (with autonomous vehicles)
-void autonomous_traffic_intersection_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
+void traffic_light_intersection_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
 
-// Reverse event handler for an intersection:
-void intersection_reverse_eventhandler(intersection_state*, tw_bf*, message_data*, tw_lp*);
-// Temp
-//void intersection_reverse_eventhandler(intersection_state* s, tw_bf* b, message_data* d, tw_lp* l) { }
+void traffic_light_intersection_reverse_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
+
+// With communicating autonomous vehicles
+
+void autonomous_traffic_intersection_startup(intersection_state*, tw_lp*);
+
+void autonomous_traffic_intersection_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
+
+void autonomous_traffic_intersection_reverse_eventhandler(
+    intersection_state*,
+    tw_bf*,
+    message_data*,
+    tw_lp*
+);
 
 // Function to collection statistics for an intersection:
 void intersection_statistics_collectstats(intersection_state*, tw_lp*);
-// Temp
-//void intersection_statistics_collectstats(intersection_state* s, tw_lp* l) { }
 
 // Mapping functions
 tw_peid cell_mapping_lp_to_pe(tw_lpid lpid);
