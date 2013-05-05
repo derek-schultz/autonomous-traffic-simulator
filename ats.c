@@ -604,15 +604,11 @@ void intersection_reverse_eventhandler(intersection_state* SV, tw_bf* CV, messag
 				SV->num_cars_in_north--;
 			}
 			else if(M->car.x_to_go > 0) {
-				//SV->west_lanes[1].cars[SV->west_lanes[1].number_of_cars] = M->car;
-				//SV->west_lanes[1].number_of_cars++;
 				
 				// Add a car in the west lane:
 				SV->num_cars_in_west--;
 			}
 			else if(M->car.x_to_go < 0) {
-				//SV->east_lanes[1].cars[SV->east_lanes[1].number_of_cars] = M->car;
-				//SV->east_lanes[1].number_of_cars++;
 				
 				// Add a car in the east lane:
 				SV->num_cars_in_east--;
