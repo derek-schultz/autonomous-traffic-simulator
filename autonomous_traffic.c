@@ -89,7 +89,7 @@ void autonomous_traffic_intersection_eventhandler(
             M->car.end_time = tw_now(LP);
             SV->total_cars_finished++;
             g_total_time += (M->car.end_time - M->car.start_time);
-            printf("Car finished with x: %d and y: %d with time: %d\n",
+            printf("Autonomous car finished with x: %d and y: %d with time: %d\n",
                    M->car.x_to_go_original, M->car.y_to_go_original,
                    (M->car.end_time - M->car.start_time));
             break;
