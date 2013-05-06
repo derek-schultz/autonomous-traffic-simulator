@@ -134,10 +134,8 @@ int main(int argc, char* argv[]) {
 
     tw_run();
     tw_end();
-
-	printf("Number of cars finised %lld\n", g_cars_finished);
-	printf("Number of cars that arrived %lld\n", g_total_cars);
-	printf("Average travel time %llu\n", g_average_time);
+	
+	printf("%llu\n", g_average_time);
 	
     return 0;
 } /** END FUNCTION main **/
@@ -282,7 +280,6 @@ tw_lpid cell_compute_move(tw_lpid lpid, int direction)
     // printf("ComputeMove: Src LP %llu (%d, %d), Dir %u, Dest LP %llu (%d, %d)\n", lpid, lpid_x, lpid_y, direction, dest_lpid, n_x, n_y);
     return dest_lpid;
 }
-
 
 void intersection_statistics_collectstats(intersection_state* SV, tw_lp* LP) {
 	g_total_cars += SV->total_cars_arrived;
