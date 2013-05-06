@@ -232,7 +232,7 @@ void autonomous_traffic_intersection_eventhandler(
             // Move up when the car at the front enters the intersection
             ts = lead_car_enters - tw_now(LP);
             // This awkward off-by-one can't be avoided
-            M->car.queue_position--;
+            M->car.queue_location--;
         }
 
         current_event = tw_event_new(LP->gid, ts, LP);
@@ -251,10 +251,10 @@ void autonomous_traffic_intersection_eventhandler(
         break;
 
     case CAR_MOVES_FORWARD:
-        M->car.queue_position--;
+        M->car.queue_location--;
 
         // If car is at the front of the line:
-        if (M->car.queue_position == 0) {
+        if (M->car.queue_location == 0) {
             switch (M->car.intention) {
 
             case NL:
@@ -882,7 +882,7 @@ void autonomous_traffic_intersection_eventhandler(
 
 void autonomous_traffic_intersection_reverse_eventhandler(
     intersection_state* SV,
-    tw_bf* BF,
+    tw_bf* CV,
     message_data* M,
     tw_lp* LP
 ) {
@@ -974,10 +974,10 @@ void autonomous_traffic_intersection_reverse_eventhandler(
         break;
 
     case CAR_MOVES_FORWARD:
-        M->car.queue_position--;
+        M->car.queue_location--;
 
         // If car is at the front of the line:
-        if (M->car.queue_position == 0) {
+        if (M->car.queue_location == 0) {
             switch (M->car.intention) {
 
             case NL:

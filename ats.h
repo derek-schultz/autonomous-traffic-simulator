@@ -131,7 +131,7 @@ typedef struct {
     enum travel_direction intention;
     int queue_location;
 
-    lp_twid next_intersection;
+    tw_lpid next_intersection;
     
 	int has_turned;
 	
