@@ -337,6 +337,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         new_message->car.y_to_go_original = M->car.y_to_go_original;
         new_message->car.start_time = M->car.start_time;
         new_message->car.end_time = M->car.end_time;
+        new_message->car.position = M->car.position;
         new_message->event_type = CAR_ARRIVES;
         tw_event_send(current_event);
                                 
@@ -370,7 +371,7 @@ void traffic_light_intersection_reverse_eventhandler(
             SV->traffic_direction = EAST_WEST;
 
             // Update the timers on the lights
-            SV->north_south_green_until = M->saved_green_until;
+            SV->east_west_green_until = M->saved_green_until;
 
         }
         else if(SV->traffic_direction == NORTH_SOUTH) {
@@ -428,6 +429,7 @@ void traffic_light_intersection_reverse_eventhandler(
         else if(M->car.y_to_go == 0) {
 
             //TODO: figure out how to reverse has_turned
+            //TODO: also, much of this might be wrong...
 
             if(M->car.has_turned) {
 

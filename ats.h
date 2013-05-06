@@ -99,8 +99,13 @@ enum light_color { RED, GREEN };
 // Directions to determine which way traffic is permitted in an intersection:
 enum intersection_direction { NORTH_SOUTH, NORTH_SOUTH_LEFT,
                               EAST_WEST,   EAST_WEST_LEFT };
+
+// The different lanes a car can be in
 enum intersection_position { WEST, WEST_LEFT, EAST, EAST_LEFT,
                              SOUTH, SOUTH_LEFT, NORTH, NORTH_LEFT };
+
+// The different travel intentions a car can have
+// NL indicates coming from the north, turning left, etc.
 enum travel_direction { NL, NR, NS, EL, ER, ES, SL, SR, SS, WL, WR, WS };
 
 /**************************************** END ENUMS BLOCK ********************/
@@ -121,6 +126,8 @@ typedef struct {
     int y_to_go_original;
 
     enum intersection_position position;
+    enum travel_direction intention;
+    int queue_location;
     
 	int has_turned;
 	
@@ -163,6 +170,8 @@ typedef struct {
     tw_stime north_south_left_green_until;
     tw_stime east_west_green_until;
     tw_stime east_west_left_green_until;
+
+    tw_stime lead_car_will_enter;
 
     // Variable to hold the direction the lights are going:
     enum intersection_direction traffic_direction;
