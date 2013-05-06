@@ -61,6 +61,7 @@ void autonomous_traffic_intersection_eventhandler(
 
     // Time warp starting time:
     tw_stime ts = 0.0;
+    tw_stime departure_time;
     
     // Current event:
     tw_event* current_event = NULL;
@@ -231,210 +232,217 @@ void autonomous_traffic_intersection_eventhandler(
             switch (M->car.intention) {
 
             case NL:
-                if (SV->SS_LOCK > tw_now(LP)) {
-                    departure_time = SV->SS_LOCK;
+                if (SV->SS_lock > tw_now(LP)) {
+                    departure_time = SV->SS_lock;
                 }
-                if (SV->SR_LOCK > tw_now(LP) && SV->SR_LOCK > departure_time) {
-                    departure_time = SV->SR_LOCK;
+                if (SV->SR_lock > tw_now(LP) && SV->SR_lock > departure_time) {
+                    departure_time = SV->SR_lock;
                 } 
-                if (SV->ES_LOCK > tw_now(LP) && SV->ES_LOCK > departure_time) {
-                    departure_time = SV->ES_LOCK;
+                if (SV->ES_lock > tw_now(LP) && SV->ES_lock > departure_time) {
+                    departure_time = SV->ES_lock;
                 } 
-                if (SV->EL_LOCK > tw_now(LP) && SV->EL_LOCK > departure_time) {
-                    departure_time = SV->EL_LOCK;
+                if (SV->EL_lock > tw_now(LP) && SV->EL_lock > departure_time) {
+                    departure_time = SV->EL_lock;
                 } 
-                if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
-                    departure_time = SV->WS_LOCK;
+                if (SV->WS_lock > tw_now(LP) && SV->WS_lock > departure_time) {
+                    departure_time = SV->WS_lock;
                 } 
-                if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
-                    departure_time = SV->WL_LOCK;
+                if (SV->WL_lock > tw_now(LP) && SV->WL_lock > departure_time) {
+                    departure_time = SV->WL_lock;
                 }
                 break;
                 
             case NR:
-                if (SV->SL_LOCK > tw_now(LP)) {
-                    departure_time = SV->SL_LOCK;
+                if (SV->SL_lock > tw_now(LP)) {
+                    departure_time = SV->SL_lock;
                 }
-                if (SV->ES_LOCK > tw_now(LP) && SV->ES_LOCK > departure_time) {
-                    departure_time = SV->ES_LOCK;
+                if (SV->ES_lock > tw_now(LP) && SV->ES_lock > departure_time) {
+                    departure_time = SV->ES_lock;
                 }
                 break;
                 
             case NS:
-                if (SV->SL_LOCK > tw_now(LP)) {
-                    departure_time = SV->SL_LOCK;
+                if (SV->SL_lock > tw_now(LP)) {
+                    departure_time = SV->SL_lock;
                 }
-                if (SV->ES_LOCK > tw_now(LP) && SV->ES_LOCK > departure_time) {
-                    departure_time = SV->ES_LOCK;
+                if (SV->ES_lock > tw_now(LP) && SV->ES_lock > departure_time) {
+                    departure_time = SV->ES_lock;
                 } 
-                if (SV->EL_LOCK > tw_now(LP) && SV->EL_LOCK > departure_time) {
-                    departure_time = SV->EL_LOCK;
+                if (SV->EL_lock > tw_now(LP) && SV->EL_lock > departure_time) {
+                    departure_time = SV->EL_lock;
                 } 
-                if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
-                    departure_time = SV->WS_LOCK;
+                if (SV->WS_lock > tw_now(LP) && SV->WS_lock > departure_time) {
+                    departure_time = SV->WS_lock;
                 } 
-                if (SV->WR_LOCK > tw_now(LP) && SV->WR_LOCK > departure_time) {
-                    departure_time = SV->WR_LOCK;
+                if (SV->WR_lock > tw_now(LP) && SV->WR_lock > departure_time) {
+                    departure_time = SV->WR_lock;
                 } 
-                if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
-                    departure_time = SV->WL_LOCK;
+                if (SV->WL_lock > tw_now(LP) && SV->WL_lock > departure_time) {
+                    departure_time = SV->WL_lock;
                 }
                 break;
                 
             case EL:
-                if (SV->SS_LOCK > tw_now(LP)) {
-                    departure_time = SV->SS_LOCK;
+                if (SV->SS_lock > tw_now(LP)) {
+                    departure_time = SV->SS_lock;
                 }
-                if (SV->SL_LOCK > tw_now(LP) && SV->SL_LOCK > departure_time) {
-                    departure_time = SV->SL_LOCK;
+                if (SV->SL_lock > tw_now(LP) && SV->SL_lock > departure_time) {
+                    departure_time = SV->SL_lock;
                 } 
-                if (SV->NS_LOCK > tw_now(LP) && SV->NS_LOCK > departure_time) {
-                    departure_time = SV->NS_LOCK;
+                if (SV->NS_lock > tw_now(LP) && SV->NS_lock > departure_time) {
+                    departure_time = SV->NS_lock;
                 } 
-                if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
-                    departure_time = SV->NL_LOCK;
+                if (SV->NL_lock > tw_now(LP) && SV->NL_lock > departure_time) {
+                    departure_time = SV->NL_lock;
                 } 
-                if (SV->WR_LOCK > tw_now(LP) && SV->WR_LOCK > departure_time) {
-                    departure_time = SV->WR_LOCK;
+                if (SV->WR_lock > tw_now(LP) && SV->WR_lock > departure_time) {
+                    departure_time = SV->WR_lock;
                 } 
-                if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
-                    departure_time = SV->WS_LOCK;
+                if (SV->WS_lock > tw_now(LP) && SV->WS_lock > departure_time) {
+                    departure_time = SV->WS_lock;
                 }
                 break;
                 
             case ER:
-                if (SV->SS_LOCK > tw_now(LP)) {
-                    departure_time = SV->SS_LOCK;
+                if (SV->SS_lock > tw_now(LP)) {
+                    departure_time = SV->SS_lock;
                 }
-                if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
-                    departure_time = SV->WL_LOCK;
+                if (SV->WL_lock > tw_now(LP) && SV->WL_lock > departure_time) {
+                    departure_time = SV->WL_lock;
                 }
                 break;
                 
             case ES:
-                if (SV->SS_LOCK > tw_now(LP)) {
-                    departure_time = SV->SS_LOCK;
+                if (SV->SS_lock > tw_now(LP)) {
+                    departure_time = SV->SS_lock;
                 }
-                if (SV->SL_LOCK > tw_now(LP) && SV->SL_LOCK > departure_time) {
-                    departure_time = SV->SL_LOCK;
+                if (SV->SL_lock > tw_now(LP) && SV->SL_lock > departure_time) {
+                    departure_time = SV->SL_lock;
                 } 
-                if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
-                    departure_time = SV->NL_LOCK;
+                if (SV->NL_lock > tw_now(LP) && SV->NL_lock > departure_time) {
+                    departure_time = SV->NL_lock;
                 } 
-                if (SV->NR_LOCK > tw_now(LP) && SV->NR_LOCK > departure_time) {
-                    departure_time = SV->NR_LOCK;
+                if (SV->NR_lock > tw_now(LP) && SV->NR_lock > departure_time) {
+                    departure_time = SV->NR_lock;
                 } 
-                if (SV->NS_LOCK > tw_now(LP) && SV->NS_LOCK > departure_time) {
-                    departure_time = SV->NS_LOCK;
+                if (SV->NS_lock > tw_now(LP) && SV->NS_lock > departure_time) {
+                    departure_time = SV->NS_lock;
                 } 
-                if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
-                    departure_time = SV->WL_LOCK;
+                if (SV->WL_lock > tw_now(LP) && SV->WL_lock > departure_time) {
+                    departure_time = SV->WL_lock;
                 }
                 break;
                 
             case SL:
-                if (SV->ES_LOCK > tw_now(LP)) {
-                    departure_time = SV->ES_LOCK;
+                if (SV->ES_lock > tw_now(LP)) {
+                    departure_time = SV->ES_lock;
                 }
-                if (SV->EL_LOCK > tw_now(LP) && SV->EL_LOCK > departure_time) {
-                    departure_time = SV->EL_LOCK;
+                if (SV->EL_lock > tw_now(LP) && SV->EL_lock > departure_time) {
+                    departure_time = SV->EL_lock;
                 } 
-                if (SV->NR_LOCK > tw_now(LP) && SV->NR_LOCK > departure_time) {
-                    departure_time = SV->NR_LOCK;
+                if (SV->NR_lock > tw_now(LP) && SV->NR_lock > departure_time) {
+                    departure_time = SV->NR_lock;
                 } 
-                if (SV->NS_LOCK > tw_now(LP) && SV->NS_LOCK > departure_time) {
-                    departure_time = SV->NS_LOCK;
+                if (SV->NS_lock > tw_now(LP) && SV->NS_lock > departure_time) {
+                    departure_time = SV->NS_lock;
                 } 
-                if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
-                    departure_time = SV->WL_LOCK;
+                if (SV->WL_lock > tw_now(LP) && SV->WL_lock > departure_time) {
+                    departure_time = SV->WL_lock;
                 } 
-                if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
-                    departure_time = SV->WS_LOCK;
+                if (SV->WS_lock > tw_now(LP) && SV->WS_lock > departure_time) {
+                    departure_time = SV->WS_lock;
                 }
                 break;
                 
             case SR:
-                if (SV->WS_LOCK > tw_now(LP)) {
-                    departure_time = SV->WS_LOCK;
+                if (SV->WS_lock > tw_now(LP)) {
+                    departure_time = SV->WS_lock;
                 }
-                if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
-                    departure_time = SV->NL_LOCK;
+                if (SV->NL_lock > tw_now(LP) && SV->NL_lock > departure_time) {
+                    departure_time = SV->NL_lock;
                 }
                 break;
                 
             case SS:
-                if (SV->NL_LOCK > tw_now(LP)) {
-                    departure_time = SV->NL_LOCK;
+                if (SV->NL_lock > tw_now(LP)) {
+                    departure_time = SV->NL_lock;
                 }
-                if (SV->ES_LOCK > tw_now(LP) && SV->ES_LOCK > departure_time) {
-                    departure_time = SV->ES_LOCK;
+                if (SV->ES_lock > tw_now(LP) && SV->ES_lock > departure_time) {
+                    departure_time = SV->ES_lock;
                 } 
-                if (SV->EL_LOCK > tw_now(LP) && SV->EL_LOCK > departure_time) {
-                    departure_time = SV->EL_LOCK;
+                if (SV->EL_lock > tw_now(LP) && SV->EL_lock > departure_time) {
+                    departure_time = SV->EL_lock;
                 } 
-                if (SV->ER_LOCK > tw_now(LP) && SV->ER_LOCK > departure_time) {
-                    departure_time = SV->ER_LOCK;
+                if (SV->ER_lock > tw_now(LP) && SV->ER_lock > departure_time) {
+                    departure_time = SV->ER_lock;
                 } 
-                if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
-                    departure_time = SV->WS_LOCK;
+                if (SV->WS_lock > tw_now(LP) && SV->WS_lock > departure_time) {
+                    departure_time = SV->WS_lock;
                 } 
-                if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
-                    departure_time = SV->WL_LOCK;
+                if (SV->WL_lock > tw_now(LP) && SV->WL_lock > departure_time) {
+                    departure_time = SV->WL_lock;
                 }
                 break;
                 
             case WL:
-                if (SV->NS_LOCK > tw_now(LP)) {
-                    departure_time = SV->NS_LOCK;
+                if (SV->NS_lock > tw_now(LP)) {
+                    departure_time = SV->NS_lock;
                 }
-                if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
-                    departure_time = SV->NL_LOCK;
+                if (SV->NL_lock > tw_now(LP) && SV->NL_lock > departure_time) {
+                    departure_time = SV->NL_lock;
                 } 
-                if (SV->SS_LOCK > tw_now(LP) && SV->SS_LOCK > departure_time) {
-                    departure_time = SV->SS_LOCK;
+                if (SV->SS_lock > tw_now(LP) && SV->SS_lock > departure_time) {
+                    departure_time = SV->SS_lock;
                 } 
-                if (SV->SL_LOCK > tw_now(LP) && SV->SL_LOCK > departure_time) {
-                    departure_time = SV->SL_LOCK;
+                if (SV->SL_lock > tw_now(LP) && SV->SL_lock > departure_time) {
+                    departure_time = SV->SL_lock;
                 } 
-                if (SV->ES_LOCK > tw_now(LP) && SV->ES_LOCK > departure_time) {
-                    departure_time = SV->ES_LOCK;
+                if (SV->ES_lock > tw_now(LP) && SV->ES_lock > departure_time) {
+                    departure_time = SV->ES_lock;
                 } 
-                if (SV->ER_LOCK > tw_now(LP) && SV->ER_LOCK > departure_time) {
-                    departure_time = SV->ER_LOCK;
+                if (SV->ER_lock > tw_now(LP) && SV->ER_lock > departure_time) {
+                    departure_time = SV->ER_lock;
                 }
                 break;
                 
             case WR:
-                if (SV->EL_LOCK > tw_now(LP)) {
-                    departure_time = SV->EL_LOCK;
+                if (SV->EL_lock > tw_now(LP)) {
+                    departure_time = SV->EL_lock;
                 }
-                if (SV->NS_LOCK > tw_now(LP) && SV->NS_LOCK > departure_time) {
-                    departure_time = SV->NS_LOCK;
+                if (SV->NS_lock > tw_now(LP) && SV->NS_lock > departure_time) {
+                    departure_time = SV->NS_lock;
                 }
                 break;
                 
             case WS:
-                if (SV->SS_LOCK > tw_now(LP)) {
-                    departure_time = SV->SS_LOCK;
+                if (SV->SS_lock > tw_now(LP)) {
+                    departure_time = SV->SS_lock;
                 }
-                if (SV->SL_LOCK > tw_now(LP) && SV->SL_LOCK > departure_time) {
-                    departure_time = SV->SL_LOCK;
+                if (SV->SL_lock > tw_now(LP) && SV->SL_lock > departure_time) {
+                    departure_time = SV->SL_lock;
                 } 
-                if (SV->SR_LOCK > tw_now(LP) && SV->SR_LOCK > departure_time) {
-                    departure_time = SV->SR_LOCK;
+                if (SV->SR_lock > tw_now(LP) && SV->SR_lock > departure_time) {
+                    departure_time = SV->SR_lock;
                 } 
-                if (SV->EL_LOCK > tw_now(LP) && SV->EL_LOCK > departure_time) {
-                    departure_time = SV->EL_LOCK;
+                if (SV->EL_lock > tw_now(LP) && SV->EL_lock > departure_time) {
+                    departure_time = SV->EL_lock;
                 } 
-                if (SV->NS_LOCK > tw_now(LP) && SV->NS_LOCK > departure_time) {
-                    departure_time = SV->NS_LOCK;
+                if (SV->NS_lock > tw_now(LP) && SV->NS_lock > departure_time) {
+                    departure_time = SV->NS_lock;
                 } 
-                if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
-                    departure_time = SV->NL_LOCK;
+                if (SV->NL_lock > tw_now(LP) && SV->NL_lock > departure_time) {
+                    departure_time = SV->NL_lock;
                 }
                 break;
             }
+
+            // TODO: schedule enter intersection
+
         }
+        break;
+
+    case CAR_ENTERS_INTERSECTION:
+        break;
 
 
     case CARS_GO:

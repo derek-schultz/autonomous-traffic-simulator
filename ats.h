@@ -172,6 +172,11 @@ typedef struct {
     tw_stime east_west_left_green_until;
 
     tw_stime lead_car_will_enter;
+    
+    tw_stime NS_lock, NR_lock, NL_lock;
+    tw_stime ES_lock, ER_lock, EL_lock;
+    tw_stime WS_lock, WR_lock, WL_lock;
+    tw_stime SS_lock, SR_lock, SL_lock;
 
     // Variable to hold the direction the lights are going:
     enum intersection_direction traffic_direction;
