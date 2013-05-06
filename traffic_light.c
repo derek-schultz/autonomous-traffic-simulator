@@ -338,6 +338,7 @@ void traffic_light_intersection_eventhandler(intersection_state* SV, tw_bf* CV,
         new_message->car.start_time = M->car.start_time;
         new_message->car.end_time = M->car.end_time;
         new_message->car.position = M->car.position;
+        new_message->car.has_turned = M->car.has_turned;
         new_message->event_type = CAR_ARRIVES;
         tw_event_send(current_event);
                                 

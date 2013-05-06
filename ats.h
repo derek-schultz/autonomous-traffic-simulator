@@ -40,7 +40,6 @@
 
 /*
  * GLOBALS AND CONSTANTS
- * Maybe temporary until I figure out what is going on!
  */
 
 // VPs per PE?
@@ -134,6 +133,8 @@ typedef struct {
     tw_lpid next_intersection;
     
 	int has_turned;
+
+    unsigned int id;
 	
 } car_type;
 

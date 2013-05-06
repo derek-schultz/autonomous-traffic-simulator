@@ -1,5 +1,7 @@
 #include "ats.h"
 
+static unsigned int car_counter = 0;
+
 void autonomous_traffic_intersection_startup(intersection_state* SV,
                                              tw_lp* LP) {
     tw_stime ts = 0;
@@ -47,6 +49,12 @@ void autonomous_traffic_intersection_startup(intersection_state* SV,
                                                    MAX_TRAVEL_DISTANCE);
         new_message->car.x_to_go_original = new_message->car.x_to_go;
         new_message->car.y_to_go_original = new_message->car.y_to_go;
+
+        new_message->car.id = car_counter;
+        car_counter++;
+
+        //printf("putting car on the road. x: %d y: %d", new_message->car.x_to_go, new_message->car.y_to_go);
+
         if (new_message->car.y_to_go == 0)
             new_message->car.has_turned = 1;
         else
@@ -94,7 +102,22 @@ void autonomous_traffic_intersection_eventhandler(
                    (M->car.end_time - M->car.start_time));
             break;
         }
-        
+
+        if (M->car.id == 0 || LP->gid == 0) {
+
+            printf("Autonomous car %d arrives at intersection %d with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
+                   M->car.id, LP->gid, M->car.position,
+                   M->car.x_to_go, M->car.y_to_go,
+                   M->car.x_to_go_original, M->car.y_to_go_original,
+                   (tw_now(LP) - M->car.start_time));
+            printf("%d %d %d %d %d %d %d %d\n",
+                   SV->num_cars_north, SV->num_cars_north_left,
+                   SV->num_cars_east, SV->num_cars_east_left,
+                   SV->num_cars_south, SV->num_cars_south_left,
+                   SV->num_cars_west, SV->num_cars_west_left);
+
+        }
+
         // Increment the total number of cars in this intersection:
         SV->total_cars_arrived++;
 
@@ -225,26 +248,47 @@ void autonomous_traffic_intersection_eventhandler(
             }
         }
 
-        if (M->car.queue_location == 1) {
+        M->car.queue_location--;
+        if (M->car.queue_location == 0) {
             // There is no one waiting! Move up now!
             ts = 0.0;
+
+                        if (LP->gid == 0)
+            printf("The lead car will enter %f. Autonomous car %d headed %d is in queue position %d and will leave in %f sec with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
+                   lead_car_enters, M->car.id, M->car.position, M->car.queue_location, ts,
+                   M->car.x_to_go, M->car.y_to_go,
+                   M->car.x_to_go_original, M->car.y_to_go_original,
+                   (tw_now(LP) - M->car.start_time));
+
         } else {
             // Move up when the car at the front enters the intersection
             ts = lead_car_enters - tw_now(LP);
             // This awkward off-by-one can't be avoided
-            M->car.queue_location--;
+            
+
+            if (LP->gid == 0)
+            printf("The lead car will enter %f. Autonomous car %d headed %d is in queue position %d and will leave in %f sec with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
+                   lead_car_enters, M->car.id, M->car.position, M->car.queue_location, ts,
+                   M->car.x_to_go, M->car.y_to_go,
+                   M->car.x_to_go_original, M->car.y_to_go_original,
+                   (tw_now(LP) - M->car.start_time));
+
         }
 
         current_event = tw_event_new(LP->gid, ts, LP);
         new_message = (message_data*)tw_event_data(current_event);
         new_message->car.x_to_go = M->car.x_to_go;
         new_message->car.y_to_go = M->car.y_to_go;
+        new_message->car.x_to_go_original = M->car.x_to_go_original;
+        new_message->car.y_to_go_original = M->car.y_to_go_original;
         new_message->car.start_time = M->car.start_time;
         new_message->car.end_time = M->car.end_time;
         new_message->car.position = M->car.position;
         new_message->car.intention = M->car.intention;
+        new_message->car.has_turned = M->car.has_turned;
         new_message->car.next_intersection = M->car.next_intersection;
         new_message->car.queue_location;
+        new_message->car.id = M->car.id;
         new_message->event_type = CAR_MOVES_FORWARD;
         tw_event_send(current_event);
 
@@ -253,8 +297,28 @@ void autonomous_traffic_intersection_eventhandler(
     case CAR_MOVES_FORWARD:
         M->car.queue_location--;
 
+                if (M->car.id == 0)
+
+            printf("Autonomous car 0 moves forward with x: %d and y: %d and x original: %d and y original: %d with time: %f and queue: %d\n",
+                   M->car.x_to_go, M->car.y_to_go,
+                   M->car.x_to_go_original, M->car.y_to_go_original,
+                   (tw_now(LP) - M->car.start_time), M->car.queue_location);
+
+
         // If car is at the front of the line:
-        if (M->car.queue_location == 0) {
+        if (M->car.queue_location == -1) {
+        
+
+        if (M->car.id == 0)
+
+            printf("Autonomous car 0 is first in line with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
+                   M->car.x_to_go, M->car.y_to_go,
+                   M->car.x_to_go_original, M->car.y_to_go_original,
+                   (tw_now(LP) - M->car.start_time));
+
+
+
+            departure_time = tw_now(LP);
             switch (M->car.intention) {
 
             case NL:
@@ -742,18 +806,28 @@ void autonomous_traffic_intersection_eventhandler(
                 break;
             }
 
-            ts = departure_time;
+            ts = departure_time - tw_now(LP);
+
+                            if (M->car.id == 0)
+
+            printf("Autonomous car 0 scheduled to depart at %f\n",
+                   departure_time);
+
 
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
             new_message->car.y_to_go = M->car.y_to_go;
+            new_message->car.x_to_go_original = M->car.x_to_go_original;
+            new_message->car.y_to_go_original = M->car.y_to_go_original;
             new_message->car.start_time = M->car.start_time;
             new_message->car.end_time = M->car.end_time;
             new_message->car.position = M->car.position;
             new_message->car.intention = M->car.intention;
+            new_message->car.has_turned = M->car.has_turned;
             new_message->car.next_intersection = M->car.next_intersection;
             new_message->car.queue_location;
+            new_message->car.id = M->car.id;
             new_message->event_type = CAR_ENTERS_INTERSECTION;
             tw_event_send(current_event);
 
@@ -766,35 +840,43 @@ void autonomous_traffic_intersection_eventhandler(
             switch(M->car.position) {
 
             case NORTH:
-                ts = SV->north_lead_car_will_enter;
+                ts = SV->north_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case NORTH_LEFT:
-                ts = SV->north_left_lead_car_will_enter;
+                ts = SV->north_left_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case SOUTH:
-                ts = SV->south_lead_car_will_enter;
+                ts = SV->south_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case SOUTH_LEFT:
-                ts = SV->south_left_lead_car_will_enter;
+                ts = SV->south_left_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case EAST:
-                ts = SV->east_lead_car_will_enter;
+                ts = SV->east_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case EAST_LEFT:
-                ts = SV->east_left_lead_car_will_enter;
+                ts = SV->east_left_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case WEST:
-                ts = SV->west_lead_car_will_enter;
+                ts = SV->west_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             case WEST_LEFT:
-                ts = SV->west_left_lead_car_will_enter;
+                ts = SV->west_left_lead_car_will_enter
+                     + CAR_ACCELERATION_DELAY * M->car.queue_location;
                 break;
 
             }
@@ -803,12 +885,16 @@ void autonomous_traffic_intersection_eventhandler(
             new_message = (message_data*)tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
             new_message->car.y_to_go = M->car.y_to_go;
+            new_message->car.x_to_go_original = M->car.x_to_go_original;
+            new_message->car.y_to_go_original = M->car.y_to_go_original;
             new_message->car.start_time = M->car.start_time;
             new_message->car.end_time = M->car.end_time;
             new_message->car.position = M->car.position;
             new_message->car.intention = M->car.intention;
+            new_message->car.has_turned = M->car.has_turned;
             new_message->car.next_intersection = M->car.next_intersection;
             new_message->car.queue_location;
+            new_message->car.id = M->car.id;
             new_message->event_type = CAR_MOVES_FORWARD;
             tw_event_send(current_event);
 
@@ -817,44 +903,64 @@ void autonomous_traffic_intersection_eventhandler(
         break;
 
     case CAR_ENTERS_INTERSECTION:
+
+            if (M->car.id == 0)
+
+            printf("Autonomous car 0 enters intersection with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
+                   M->car.x_to_go, M->car.y_to_go,
+                   M->car.x_to_go_original, M->car.y_to_go_original,
+                   (tw_now(LP) - M->car.start_time));
+
         // apply lock
         switch(M->car.intention) {
 
         case NS:
             SV->NS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_north--;
             break;
         case NR:
             SV->NR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_north--;
             break;
         case NL:
             SV->NL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_north_left--;
             break;
         case ES:
             SV->ES_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_east--;
             break;
         case ER:
             SV->ER_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_east--;
             break;
         case EL:
             SV->EL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_east_left--;
             break;
         case SS:
             SV->SS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_south--;
             break;
         case SR:
             SV->SR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_south--;
             break;
         case SL:
             SV->SL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_south_left--;
             break;
         case WS:
             SV->WS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_west--;
             break;
         case WR:
             SV->WR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_west--;
             break;
         case WL:
             SV->WL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
+            SV->num_cars_west_left--;
             break;
 
         }
@@ -866,12 +972,17 @@ void autonomous_traffic_intersection_eventhandler(
         new_message = (message_data*)tw_event_data(current_event);
         new_message->car.x_to_go = M->car.x_to_go;
         new_message->car.y_to_go = M->car.y_to_go;
+        new_message->car.x_to_go_original = M->car.x_to_go_original;
+        new_message->car.y_to_go_original = M->car.y_to_go_original;
         new_message->car.start_time = M->car.start_time;
         new_message->car.end_time = M->car.end_time;
         new_message->car.position = M->car.position;
         new_message->car.intention = M->car.intention;
+        new_message->car.has_turned = M->car.has_turned;
+        new_message->car.next_intersection = M->car.next_intersection;
         new_message->car.queue_location;
-        new_message->event_type = CAR_ENTERS_INTERSECTION;
+        new_message->car.id = M->car.id;
+        new_message->event_type = CAR_ARRIVES;
         tw_event_send(current_event);
 
         break;
