@@ -15,6 +15,8 @@
 #ifndef _ATS_H_
 #define _ATS_H_
 
+//#define DEBUG
+
 // Include the ROSS Library:
 #include <ross.h>
 
