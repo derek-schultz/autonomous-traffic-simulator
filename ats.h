@@ -34,6 +34,7 @@
 #define MINIMUM_TRAVEL_TIME 60
 #define TRAVEL_TIME_VARIATION 10
 #define MAX_TRAVEL_DISTANCE 100
+#define INTERSECTION_CROSSING_TIME 4
 
 /** END DEFINES BLOCK **/
 
@@ -91,7 +92,8 @@ unsigned int autonomous;
 /****************************************** ENUMS ****************************/
 
 // Events enumeration:
-enum event { LIGHT_CHANGE, CAR_ARRIVES, CAR_DEPARTS };
+enum event { LIGHT_CHANGE, CAR_ARRIVES,
+             CAR_MOVES_FORWARD, CAR_ENTERS_INTERSECTION };
 
 // Traffic lights enumeration:
 enum light_color { RED, GREEN };
@@ -128,6 +130,8 @@ typedef struct {
     enum intersection_position position;
     enum travel_direction intention;
     int queue_location;
+
+    lp_twid next_intersection;
     
 	int has_turned;
 	
@@ -143,6 +147,20 @@ typedef struct {
 
     // We need to save light timing information so we can reverse it
     tw_stime saved_green_until;
+
+    tw_stime saved_north_lead_car_will_enter;
+    tw_stime saved_north_left_lead_car_will_enter;
+    tw_stime saved_east_lead_car_will_enter;
+    tw_stime saved_east_left_lead_car_will_enter;
+    tw_stime saved_south_lead_car_will_enter;
+    tw_stime saved_south_left_lead_car_will_enter;
+    tw_stime saved_west_lead_car_will_enter;
+    tw_stime saved_west_left_lead_car_will_enter;
+
+    tw_stime saved_NS_lock, saved_NR_lock, saved_NL_lock;
+    tw_stime saved_ES_lock, saved_ER_lock, saved_EL_lock;
+    tw_stime saved_WS_lock, saved_WR_lock, saved_WL_lock;
+    tw_stime saved_SS_lock, saved_SR_lock, saved_SL_lock;
 
 } message_data;
 
@@ -171,7 +189,10 @@ typedef struct {
     tw_stime east_west_green_until;
     tw_stime east_west_left_green_until;
 
-    tw_stime lead_car_will_enter;
+    tw_stime north_lead_car_will_enter, north_left_lead_car_will_enter;
+    tw_stime east_lead_car_will_enter, east_left_lead_car_will_enter;
+    tw_stime south_lead_car_will_enter, south_left_lead_car_will_enter;
+    tw_stime west_lead_car_will_enter, west_left_lead_car_will_enter;
     
     tw_stime NS_lock, NR_lock, NL_lock;
     tw_stime ES_lock, ER_lock, EL_lock;
