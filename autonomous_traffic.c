@@ -284,7 +284,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
                     departure_time = SV->WL_LOCK;
                 }
-
+                break;
+                
             case NR:
                 if (SV->SL_LOCK > tw_now(LP)) {
                     departure_time = SV->SL_LOCK;
@@ -292,7 +293,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->ES_LOCK > tw_now(LP) && SV->ES_LOCK > departure_time) {
                     departure_time = SV->ES_LOCK;
                 }
-            
+                break;
+                
             case NS:
                 if (SV->SL_LOCK > tw_now(LP)) {
                     departure_time = SV->SL_LOCK;
@@ -312,7 +314,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
                     departure_time = SV->WL_LOCK;
                 }
-            
+                break;
+                
             case EL:
                 if (SV->SS_LOCK > tw_now(LP)) {
                     departure_time = SV->SS_LOCK;
@@ -332,7 +335,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
                     departure_time = SV->WS_LOCK;
                 }
-            
+                break;
+                
             case ER:
                 if (SV->SS_LOCK > tw_now(LP)) {
                     departure_time = SV->SS_LOCK;
@@ -340,7 +344,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
                     departure_time = SV->WL_LOCK;
                 }
-            
+                break;
+                
             case ES:
                 if (SV->SS_LOCK > tw_now(LP)) {
                     departure_time = SV->SS_LOCK;
@@ -360,7 +365,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
                     departure_time = SV->WL_LOCK;
                 }
-            
+                break;
+                
             case SL:
                 if (SV->ES_LOCK > tw_now(LP)) {
                     departure_time = SV->ES_LOCK;
@@ -380,7 +386,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WS_LOCK > tw_now(LP) && SV->WS_LOCK > departure_time) {
                     departure_time = SV->WS_LOCK;
                 }
-            
+                break;
+                
             case SR:
                 if (SV->WS_LOCK > tw_now(LP)) {
                     departure_time = SV->WS_LOCK;
@@ -388,7 +395,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
                     departure_time = SV->NL_LOCK;
                 }
-            
+                break;
+                
             case SS:
                 if (SV->NL_LOCK > tw_now(LP)) {
                     departure_time = SV->NL_LOCK;
@@ -408,7 +416,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->WL_LOCK > tw_now(LP) && SV->WL_LOCK > departure_time) {
                     departure_time = SV->WL_LOCK;
                 }
-            
+                break;
+                
             case WL:
                 if (SV->NS_LOCK > tw_now(LP)) {
                     departure_time = SV->NS_LOCK;
@@ -428,7 +437,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->ER_LOCK > tw_now(LP) && SV->ER_LOCK > departure_time) {
                     departure_time = SV->ER_LOCK;
                 }
-            
+                break;
+                
             case WR:
                 if (SV->EL_LOCK > tw_now(LP)) {
                     departure_time = SV->EL_LOCK;
@@ -436,7 +446,8 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->NS_LOCK > tw_now(LP) && SV->NS_LOCK > departure_time) {
                     departure_time = SV->NS_LOCK;
                 }
-            
+                break;
+                
             case WS:
                 if (SV->SS_LOCK > tw_now(LP)) {
                     departure_time = SV->SS_LOCK;
@@ -456,6 +467,7 @@ void autonomous_traffic_intersection_eventhandler(
                 if (SV->NL_LOCK > tw_now(LP) && SV->NL_LOCK > departure_time) {
                     departure_time = SV->NL_LOCK;
                 }
+                break;
             }
         }
 
