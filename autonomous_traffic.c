@@ -97,21 +97,22 @@ void autonomous_traffic_intersection_eventhandler(
     switch(M->event_type) {
 
     case CAR_ARRIVES:
+			//printf("CAR_ARRIVES\n");
         // Car reached its destination:
         if(M->car.y_to_go == 0 && M->car.x_to_go == 0) {
             M->car.end_time = tw_now(LP);
             SV->total_cars_finished++;
             g_total_time += (M->car.end_time - M->car.start_time);
             #ifdef DEBUG
-            printf("Autonomous car %d finished with x: %d and y: %d with time: %d\n",
-                   M->car.id, M->car.x_to_go_original, M->car.y_to_go_original,
-                   (M->car.end_time - M->car.start_time));
+            //printf("Autonomous car %d finished with x: %d and y: %d with time: %d\n",
+              //     M->car.id, M->car.x_to_go_original, M->car.y_to_go_original,
+                //   (M->car.end_time - M->car.start_time));
             #endif
             break;
         }
 
         #ifdef DEBUG
-            if (LP->gid == 0) {
+            //if (LP->gid == 0) {
 
                 printf("Autonomous car %d arrives at intersection %d with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
                        M->car.id, LP->gid,
@@ -124,7 +125,7 @@ void autonomous_traffic_intersection_eventhandler(
                        SV->num_cars_south, SV->num_cars_south_left,
                        SV->num_cars_west, SV->num_cars_west_left);
 
-            }
+           // }
         #endif
 
         // Increment the total number of cars in this intersection:
@@ -268,6 +269,8 @@ void autonomous_traffic_intersection_eventhandler(
             // This awkward off-by-one can't be avoided
         }
 
+		if(ts < 0)
+			ts = 0;
         #ifdef DEBUG
         if (LP->gid == 0)
             printf("The lead car will enter %f. Autonomous car %d headed %d is in queue position %d and will leave in %f sec with x: %d and y: %d and x original: %d and y original: %d with time: %f\n",
@@ -292,11 +295,20 @@ void autonomous_traffic_intersection_eventhandler(
         new_message->car.queue_location = M->car.queue_location;
         new_message->car.id = M->car.id;
         new_message->event_type = CAR_MOVES_FORWARD;
+		new_message->saved_north_lead_car_will_enter = M->saved_north_lead_car_will_enter;
+		new_message->saved_north_left_lead_car_will_enter = M->saved_north_left_lead_car_will_enter;
+		new_message->saved_east_lead_car_will_enter = M->saved_east_lead_car_will_enter;
+		new_message->saved_east_left_lead_car_will_enter = M->saved_east_left_lead_car_will_enter;
+		new_message->saved_south_lead_car_will_enter = M->saved_south_lead_car_will_enter;
+		new_message->saved_south_left_lead_car_will_enter = M->saved_south_left_lead_car_will_enter;
+		new_message->saved_west_lead_car_will_enter = M->saved_west_lead_car_will_enter;
+		new_message->saved_west_left_lead_car_will_enter = M->saved_west_left_lead_car_will_enter;
         tw_event_send(current_event);
 
         break;
 
     case CAR_MOVES_FORWARD:
+			//printf("CAR_MOVES_FORWARD\n");
         M->car.queue_location--;
 
         #ifdef DEBUG
@@ -310,7 +322,7 @@ void autonomous_traffic_intersection_eventhandler(
 
         // If car is at the front of the line:
         if (M->car.queue_location == -1) {
-        
+			//printf("000\n");
             #ifdef DEBUG
             if (LP->gid == 0)
 
@@ -877,7 +889,7 @@ void autonomous_traffic_intersection_eventhandler(
                 printf("Autonomous car %d scheduled to depart at %f\n",
                    M->car.id, departure_time);
             #endif
-
+			
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
@@ -890,17 +902,24 @@ void autonomous_traffic_intersection_eventhandler(
             new_message->car.intention = M->car.intention;
             new_message->car.has_turned = M->car.has_turned;
             new_message->car.next_intersection = M->car.next_intersection;
-            new_message->car.queue_location;
+            new_message->car.queue_location = M->car.queue_location;
             new_message->car.id = M->car.id;
             new_message->event_type = CAR_ENTERS_INTERSECTION;
             new_message->saved_north_lead_car_will_enter = M->saved_north_lead_car_will_enter;
+			new_message->saved_north_left_lead_car_will_enter = M->saved_north_left_lead_car_will_enter;
+			new_message->saved_east_lead_car_will_enter = M->saved_east_lead_car_will_enter;
+			new_message->saved_east_left_lead_car_will_enter = M->saved_east_left_lead_car_will_enter;
+			new_message->saved_south_lead_car_will_enter = M->saved_south_lead_car_will_enter;
+			new_message->saved_south_left_lead_car_will_enter = M->saved_south_left_lead_car_will_enter;
+			new_message->saved_west_lead_car_will_enter = M->saved_west_lead_car_will_enter;
+			new_message->saved_west_left_lead_car_will_enter = M->saved_west_left_lead_car_will_enter;
             tw_event_send(current_event);
-
+			//printf("111\n");
         }
 
         // If the car is not at the front of the line
         else {
-
+			//printf("222\n");
             // Schedule the next move up
             switch(M->car.position) {
 
@@ -945,7 +964,7 @@ void autonomous_traffic_intersection_eventhandler(
                 break;
 
             }
-
+			//printf("333\n");
             current_event = tw_event_new(LP->gid, ts, LP);
             new_message = (message_data*)tw_event_data(current_event);
             new_message->car.x_to_go = M->car.x_to_go;
@@ -958,17 +977,25 @@ void autonomous_traffic_intersection_eventhandler(
             new_message->car.intention = M->car.intention;
             new_message->car.has_turned = M->car.has_turned;
             new_message->car.next_intersection = M->car.next_intersection;
-            new_message->car.queue_location;
+            new_message->car.queue_location = M->car.queue_location;
             new_message->car.id = M->car.id;
             new_message->event_type = CAR_MOVES_FORWARD;
+			new_message->saved_north_lead_car_will_enter = M->saved_north_lead_car_will_enter;
+			new_message->saved_north_left_lead_car_will_enter = M->saved_north_left_lead_car_will_enter;
+			new_message->saved_east_lead_car_will_enter = M->saved_east_lead_car_will_enter;
+			new_message->saved_east_left_lead_car_will_enter = M->saved_east_left_lead_car_will_enter;
+			new_message->saved_south_lead_car_will_enter = M->saved_south_lead_car_will_enter;
+			new_message->saved_south_left_lead_car_will_enter = M->saved_south_left_lead_car_will_enter;
+			new_message->saved_west_lead_car_will_enter = M->saved_west_lead_car_will_enter;
+			new_message->saved_west_left_lead_car_will_enter = M->saved_west_left_lead_car_will_enter;
             tw_event_send(current_event);
-
+			
         }
-
+			//printf("444\n");
         break;
 
     case CAR_ENTERS_INTERSECTION:
-
+			//printf("CAR_ENTERS_INTERSECTION\n");
         #ifdef DEBUG
         if (LP->gid == 0)
 
@@ -1047,9 +1074,17 @@ void autonomous_traffic_intersection_eventhandler(
         new_message->car.intention = M->car.intention;
         new_message->car.has_turned = M->car.has_turned;
         new_message->car.next_intersection = M->car.next_intersection;
-        new_message->car.queue_location;
+        new_message->car.queue_location = M->car.queue_location;
         new_message->car.id = M->car.id;
         new_message->event_type = CAR_ARRIVES;
+		new_message->saved_north_lead_car_will_enter = M->saved_north_lead_car_will_enter;
+		new_message->saved_north_left_lead_car_will_enter = M->saved_north_left_lead_car_will_enter;
+		new_message->saved_east_lead_car_will_enter = M->saved_east_lead_car_will_enter;
+		new_message->saved_east_left_lead_car_will_enter = M->saved_east_left_lead_car_will_enter;
+		new_message->saved_south_lead_car_will_enter = M->saved_south_lead_car_will_enter;
+		new_message->saved_south_left_lead_car_will_enter = M->saved_south_left_lead_car_will_enter;
+		new_message->saved_west_lead_car_will_enter = M->saved_west_lead_car_will_enter;
+		new_message->saved_west_left_lead_car_will_enter = M->saved_west_left_lead_car_will_enter;
         tw_event_send(current_event);
 
         break;
@@ -1465,8 +1500,11 @@ void autonomous_traffic_intersection_reverse_eventhandler(
             break;
 
         }
+			
+		//tw_rand_reverse_unif(LP->rng);
 
         break;
 
     }
+	tw_rand_reverse_unif(LP->rng);
 }

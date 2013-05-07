@@ -23,8 +23,8 @@
 /** DEFINES **/
 
 // Number of cells in the grid (default is 64 x 64 grid):
-#define MAP_WIDTH 128
-#define MAP_HEIGHT 128
+#define MAP_WIDTH 512
+#define MAP_HEIGHT 512
 
 #define NUM_VP_X 32
 #define NUM_VP_Y 32
@@ -35,7 +35,7 @@
 #define INITIAL_ARRIVAL_MEAN 100
 #define MINIMUM_TRAVEL_TIME 60
 #define TRAVEL_TIME_VARIATION 10
-#define MAX_TRAVEL_DISTANCE 100
+#define MAX_TRAVEL_DISTANCE 200
 #define INTERSECTION_CROSSING_TIME 4
 
 /** END DEFINES BLOCK **/
