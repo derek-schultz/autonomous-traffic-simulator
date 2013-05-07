@@ -1,0 +1,318 @@
+
+	: Running Time = 34.8499 seconds
+
+TW Library Statistics:
+	Total Events Processed                               297370861
+	Events Aborted (part of RBs)                                 0
+	Events Rolled Back                                           0
+	Event Ties Detected in PE Queues                     174594048
+	Efficiency                                              100.00 %
+	Total Remote (shared mem) Events Processed                   0
+	Percent Remote Events                                     0.00 %
+	Total Remote (network) Events Processed                6442406
+	Percent Remote Events                                     2.17 %
+
+	Total Roll Backs                                             0
+	Primary Roll Backs                                           0
+	Secondary Roll Backs                                         0
+	Fossil Collect Attempts                                  72960
+	Total GVT Computations                                     285
+
+	Net Events Processed                                 297370861
+	Event Rate (events/sec)                              8532909.4
+
+TW Memory Statistics:
+	Events Allocated                                        140112
+	Memory Allocated                                         62421
+	Memory Wasted                                              303
+
+TW Network Statistics:
+	Remote sends                                           6442406
+	Remote recvs                                           6442406
+
+TW Data Structure sizes in bytes (sizeof):
+	PE struct                                                  520
+	KP struct                                                   96
+	LP struct                                                  104
+	LP Model struct                                            240
+	LP RNGs                                                     72
+	Total LP                                                   416
+	Event struct                                               112
+	Event struct with Model                                    344
+
+TW Clock Cycle Statistics (MAX values in secs at 1.0000 GHz):
+	Priority Queue (enq/deq)                                0.4532
+	Event Processing                                       28.5934
+	Event Cancel                                            0.0073
+	Event Abort                                             0.0000
+
+	GVT                                                    46.5676
+	Fossil Collect                                          1.2952
+	Primary Rollbacks                                       0.0000
+	Network Read                                            1.1808
+	Total Time (Note: Using Running Time above for Speedup)     55.7598
+
+TW GVT Statistics: MPI AllReduce
+	GVT Interval                                               512
+	Batch Size                                                   8
+
+	Forced GVT                                                   0
+	Total GVT Computations                                     285
+	Total All Reduce Calls                                    1018
+	Average Reduction / GVT                                   3.57
+5582
+5440
+5595
+5545
+5424
+5552
+5514
+5515
+5437
+5528
+5687
+5510
+5535
+5642
+5514
+5492
+5517
+5601
+5460
+5621
+5343
+5535
+5552
+5244
+5816
+5406
+5451
+5689
+5765
+5717
+5467
+5704
+5732
+5450
+5607
+5438
+5583
+5404
+5483
+5608
+5326
+5333
+5765
+5417
+5581
+5474
+5552
+5572
+5676
+5537
+5442
+5493
+5832
+5420
+5662
+5664
+5260
+5553
+5517
+5443
+5745
+5453
+5408
+5316
+5625
+5635
+5610
+5582
+5496
+5500
+5561
+5238
+5414
+5481
+5522
+5456
+5635
+5356
+5420
+5397
+5527
+5516
+5564
+5692
+5810
+5643
+5443
+5589
+5468
+5362
+5554
+5483
+5500
+5474
+5590
+5462
+5599
+5781
+5575
+5484
+5289
+5602
+5602
+5369
+5686
+5598
+5629
+5416
+5586
+5521
+5677
+5594
+5296
+5506
+5444
+5520
+5709
+5458
+5406
+5457
+5561
+5715
+5628
+5637
+5499
+5478
+5676
+5438
+5584
+5609
+5645
+5643
+5504
+5702
+5507
+5602
+5468
+5671
+5468
+5549
+5509
+5510
+5740
+5397
+5579
+5618
+5549
+5355
+5505
+5346
+5254
+5540
+5425
+5694
+5608
+5723
+5304
+5498
+5441
+5528
+5633
+5607
+5519
+5670
+5625
+5663
+5583
+5464
+5433
+5469
+5421
+5609
+5681
+5396
+5529
+5487
+5672
+5477
+5543
+5619
+5727
+5647
+5538
+5418
+5539
+5646
+5584
+5889
+5313
+5483
+5512
+5449
+5342
+5369
+5555
+5508
+5560
+5679
+5428
+5293
+5322
+5364
+5554
+5549
+5453
+5550
+5430
+5533
+5654
+5270
+5601
+5607
+5441
+5606
+5520
+5604
+5466
+5662
+5524
+5438
+5495
+5709
+5416
+5591
+5663
+5560
+5582
+5677
+5390
+5459
+5482
+5521
+5577
+5451
+5621
+5613
+5442
+5544
+5292
+5557
+5539
+5686
+5644
+5399
+5391
+5674
+5402
+5537
+5624
+5545
+5454
+5786
+5483
+5651
+5584
+5652

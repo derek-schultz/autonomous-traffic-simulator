@@ -1,0 +1,191 @@
+
+
+	: Running Time = 43.7785 seconds
+
+TW Library Statistics:
+	Total Events Processed                               297370861
+	Events Aborted (part of RBs)                                 0
+	Events Rolled Back                                           0
+	Event Ties Detected in PE Queues                     174722048
+	Efficiency                                              100.00 %
+	Total Remote (shared mem) Events Processed                   0
+	Percent Remote Events                                     0.00 %
+	Total Remote (network) Events Processed                6280776
+	Percent Remote Events                                     2.11 %
+
+	Total Roll Backs                                             0
+	Primary Roll Backs                                           0
+	Secondary Roll Backs                                         0
+	Fossil Collect Attempts                                  72832
+	Total GVT Computations                                     569
+
+	Net Events Processed                                 297370861
+	Event Rate (events/sec)                              6792627.4
+
+TW Memory Statistics:
+	Events Allocated                                        164688
+	Memory Allocated                                         71102
+	Memory Wasted                                              390
+
+TW Network Statistics:
+	Remote sends                                           6280776
+	Remote recvs                                           6280776
+
+TW Data Structure sizes in bytes (sizeof):
+	PE struct                                                  520
+	KP struct                                                   96
+	LP struct                                                  104
+	LP Model struct                                            240
+	LP RNGs                                                     72
+	Total LP                                                   416
+	Event struct                                               112
+	Event struct with Model                                    344
+
+TW Clock Cycle Statistics (MAX values in secs at 1.0000 GHz):
+	Priority Queue (enq/deq)                                0.9432
+	Event Processing                                       35.1998
+	Event Cancel                                            0.0143
+	Event Abort                                             0.0000
+
+	GVT                                                    31.6043
+	Fossil Collect                                          2.7910
+	Primary Rollbacks                                       0.0000
+	Network Read                                            2.2665
+	Total Time (Note: Using Running Time above for Speedup)     70.0456
+
+TW GVT Statistics: MPI AllReduce
+	GVT Interval                                               512
+	Batch Size                                                   8
+
+	Forced GVT                                                   0
+	Total GVT Computations                                     569
+	Total All Reduce Calls                                    2103
+	Average Reduction / GVT                                   3.70
+5536
+5442
+5458
+5552
+5673
+5556
+5654
+5645
+5536
+5552
+5521
+5561
+5519
+5492
+5426
+5648
+5524
+5545
+5528
+5473
+5532
+5555
+5652
+5540
+5539
+5329
+5561
+5666
+5523
+5542
+5624
+5349
+5427
+5511
+5532
+5504
+5579
+5502
+5573
+5555
+5611
+5566
+5367
+5467
+5469
+5349
+5618
+5599
+5619
+5470
+5585
+5377
+5557
+5455
+5529
+5480
+5533
+5420
+5411
+5571
+5367
+5443
+5319
+5549
+5609
+5473
+5506
+5604
+5565
+5710
+5552
+5537
+5596
+5582
+5484
+5578
+5576
+5658
+5510
+5486
+5623
+5468
+5511
+5592
+5626
+5624
+5506
+5520
+5526
+5433
+5566
+5520
+5443
+5522
+5492
+5522
+5595
+5670
+5587
+5601
+5327
+5653
+5692
+5625
+5613
+5538
+5586
+5462
+5553
+5423
+5592
+5561
+5596
+5454
+5653
+5466
+5551
+5631
+5611
+5512
+5386
+5655
+5507
+5386
+5533
+5526
+5555
+5493

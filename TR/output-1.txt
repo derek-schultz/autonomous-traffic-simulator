@@ -1,0 +1,59 @@
+
+	: Running Time = 1303.1202 seconds
+
+TW Library Statistics:
+	Total Events Processed                               297370861
+	Events Aborted (part of RBs)                                 0
+	Events Rolled Back                                           0
+	Event Ties Detected in PE Queues                     174849049
+	Efficiency                                              100.00 %
+	Total Remote (shared mem) Events Processed                   0
+	Percent Remote Events                                     0.00 %
+	Total Remote (network) Events Processed                      0
+	Percent Remote Events                                     0.00 %
+
+	Total Roll Backs                                             0
+	Primary Roll Backs                                           0
+	Secondary Roll Backs                                         0
+	Fossil Collect Attempts                                      0
+	Total GVT Computations                                       0
+
+	Net Events Processed                                 297370861
+	Event Rate (events/sec)                               228199.1
+
+TW Memory Statistics:
+	Events Allocated                                       6406992
+	Memory Allocated                                       2275925
+	Memory Wasted                                              108
+
+TW Data Structure sizes in bytes (sizeof):
+	PE struct                                                  520
+	KP struct                                                   96
+	LP struct                                                  104
+	LP Model struct                                            240
+	LP RNGs                                                     72
+	Total LP                                                   416
+	Event struct                                               112
+	Event struct with Model                                    344
+
+TW Clock Cycle Statistics (MAX values in secs at 1.0000 GHz):
+	Priority Queue (enq/deq)                                0.0000
+	Event Processing                                        0.0000
+	Event Cancel                                            0.0000
+	Event Abort                                             0.0000
+
+	GVT                                                     0.0000
+	Fossil Collect                                          0.0000
+	Primary Rollbacks                                       0.0000
+	Network Read                                            0.0000
+	Total Time (Note: Using Running Time above for Speedup)      0.0000
+
+TW GVT Statistics: MPI AllReduce
+	GVT Interval                                               512
+	Batch Size                                                   8
+
+	Forced GVT                                                   0
+	Total GVT Computations                                       0
+	Total All Reduce Calls                                       0
+	Average Reduction / GVT                                    nan
+5533
