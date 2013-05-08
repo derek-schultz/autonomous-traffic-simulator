@@ -1003,51 +1003,63 @@ void autonomous_traffic_intersection_eventhandler(
 
         case NS:
             SV->NS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north--;
+            SV->num_cars_north_left--;
+                        if (SV->num_cars_north < 0) SV->num_cars_north = 0;
             break;
         case NR:
             SV->NR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north--;
+            SV->num_cars_north_left--;
+                        if (SV->num_cars_north < 0) SV->num_cars_north = 0;
             break;
         case NL:
             SV->NL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
             SV->num_cars_north_left--;
+                        if (SV->num_cars_north_left < 0) SV->num_cars_north_left = 0;
             break;
         case ES:
             SV->ES_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_east--;
+            SV->num_cars_north_east--;
+                        if (SV->num_cars_east < 0) SV->num_cars_east = 0;
             break;
         case ER:
             SV->ER_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_east--;
+            SV->num_cars_north_east--;
+                        if (SV->num_cars_east < 0) SV->num_cars_east = 0;
             break;
         case EL:
             SV->EL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_east_left--;
+            SV->num_cars_north_east_left--;
+                        if (SV->num_cars_east_left < 0) SV->num_cars_east_left = 0;
             break;
         case SS:
             SV->SS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
             SV->num_cars_south--;
+                        if (SV->num_cars_south < 0) SV->num_cars_south = 0;
             break;
         case SR:
             SV->SR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
             SV->num_cars_south--;
+                        if (SV->num_cars_south < 0) SV->num_cars_south = 0;
             break;
         case SL:
             SV->SL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
             SV->num_cars_south_left--;
+                        if (SV->num_cars_south_left < 0) SV->num_cars_south_left = 0;
             break;
         case WS:
             SV->WS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_west--;
+            SV->num_cars_north_west--;
+                        if (SV->num_cars_west < 0) SV->num_cars_west = 0;
             break;
         case WR:
             SV->WR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_west--;
+            SV->num_cars_north_west--;
+                        if (SV->num_cars_west < 0) SV->num_cars_west = 0;
             break;
         case WL:
             SV->WL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_west_left--;
+            SV->num_cars_north_west_left--;
+                        if (SV->num_cars_west_left < 0) SV->num_cars_west_left = 0;
             break;
 
         }
@@ -1128,11 +1140,13 @@ void autonomous_traffic_intersection_reverse_eventhandler(
 
             // Remove car from the south lane:
             SV->num_cars_south--;
+                        if (SV->num_cars_south < 0) SV->num_cars_south = 0;
         }
         else if(M->car.y_to_go < 0) {
 
             // Add a car in the north lane:
-            SV->num_cars_north--;
+            SV->num_cars_north_left--;
+                        if (SV->num_cars_north < 0) SV->num_cars_north = 0;
         }
         else if(M->car.y_to_go == 0) {
 
@@ -1141,13 +1155,15 @@ void autonomous_traffic_intersection_reverse_eventhandler(
                 if(M->car.x_to_go > 0) {
 
                     // Add a car in the west lane:
-                    SV->num_cars_west--;
+                    SV->num_cars_north_west--;
+                        if (SV->num_cars_west < 0) SV->num_cars_west = 0;
 
                 }
                 else if(M->car.x_to_go < 0) {
 
                     // Add a car in the east lane:
-                    SV->num_cars_east--;
+                    SV->num_cars_north_east--;
+                        if (SV->num_cars_east < 0) SV->num_cars_east = 0;
 
                 }
 
@@ -1159,8 +1175,10 @@ void autonomous_traffic_intersection_reverse_eventhandler(
 
                     if(M->car.y_to_go_original > 0) {
                         SV->num_cars_south--;
+                        if (SV->num_cars_south < 0) SV->num_cars_south = 0;
                     } else {
                         SV->num_cars_north_left--;
+                        if (SV->num_cars_north_left < 0) SV->num_cars_north_left = 0;
                     }
 
                 }
@@ -1168,8 +1186,10 @@ void autonomous_traffic_intersection_reverse_eventhandler(
 
                     if(M->car.y_to_go_original > 0) {
                         SV->num_cars_south_left--;
+                        if (SV->num_cars_south_left < 0) SV->num_cars_south_left = 0;
                     } else {
-                        SV->num_cars_north--;
+                        SV->num_cars_north_left--;
+                        if (SV->num_cars_north < 0) SV->num_cars_north = 0;
                     }
 
                 }
