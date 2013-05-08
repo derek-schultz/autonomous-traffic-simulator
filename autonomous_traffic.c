@@ -1018,17 +1018,17 @@ void autonomous_traffic_intersection_eventhandler(
             break;
         case ES:
             SV->ES_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_east--;
+            SV->num_cars_north--;
                         if (SV->num_cars_east < 0) SV->num_cars_east = 0;
             break;
         case ER:
             SV->ER_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_east--;
+            SV->num_cars_north--;
                         if (SV->num_cars_east < 0) SV->num_cars_east = 0;
             break;
         case EL:
             SV->EL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_east_left--;
+            SV->num_cars_north_left--;
                         if (SV->num_cars_east_left < 0) SV->num_cars_east_left = 0;
             break;
         case SS:
@@ -1162,7 +1162,7 @@ void autonomous_traffic_intersection_reverse_eventhandler(
                 else if(M->car.x_to_go < 0) {
 
                     // Add a car in the east lane:
-                    SV->num_cars_north_east--;
+                    SV->num_cars_north--;
                         if (SV->num_cars_east < 0) SV->num_cars_east = 0;
 
                 }
