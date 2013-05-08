@@ -301,7 +301,7 @@ void autonomous_traffic_intersection_eventhandler(
         break;
 
     case CAR_MOVES_FORWARD:
-			//printf("CAR_MOVES_FORWARD\n");
+
         M->car.queue_location--;
 
         #ifdef DEBUG
@@ -315,7 +315,7 @@ void autonomous_traffic_intersection_eventhandler(
 
         // If car is at the front of the line:
         if (M->car.queue_location == -1) {
-			//printf("000\n");
+
             #ifdef DEBUG
             if (LP->gid == 0)
 
@@ -1138,43 +1138,39 @@ void autonomous_traffic_intersection_reverse_eventhandler(
 
             if(M->car.has_turned) {
 
-                if(M->car.x_to_go > 0) {
-
-                    // Remove car from the west lane:
-                    SV->num_cars_west--;
-                }
-                else if(M->car.x_to_go < 0) {
-
-                    // Remove car from the east lane:
-                    SV->num_cars_east--;
-
-                }
-
-            }
-
-            else {
-
-                M->car.has_turned = 1;
-
-                if(M->car.x_to_go > 0) {
-
+                // headed east
+                if (M->car.x_to_go_original == M->car.x_to_go_original - 1) {
                     if(M->car.y_to_go_original > 0) {
                         SV->num_cars_south--;
                     } else {
                         SV->num_cars_north_left--;
                     }
-                }
-                else if(M->car.x_to_go < 0) {
-
+                } 
+                // headed west
+                else if (M->car.x_to_go_original == M->car.x_to_go_original + 1) {
                     if(M->car.y_to_go_original > 0) {
                         SV->num_cars_south_left--;
                     } else {
                         SV->num_cars_north--;
                     }
+                } 
+                // Turned a while ago
+                else {
+                    if(M->car.x_to_go > 0) {
 
+                        // Remove car from the west lane:
+                        SV->num_cars_west--;
+                    }
+                    else if(M->car.x_to_go < 0) {
+
+                        // Remove car from the east lane:
+                        SV->num_cars_east--;
+
+                    }
                 }
 
             }
+
         }
 
         break;
