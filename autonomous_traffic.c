@@ -1018,17 +1018,17 @@ void autonomous_traffic_intersection_eventhandler(
             break;
         case ES:
             SV->ES_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north--;
+            SV->num_cars_east--;
                         if (SV->num_cars_east < 0) SV->num_cars_east = 0;
             break;
         case ER:
             SV->ER_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north--;
+            SV->num_cars_east--;
                         if (SV->num_cars_east < 0) SV->num_cars_east = 0;
             break;
         case EL:
             SV->EL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_left--;
+            SV->num_cars_east_left--;
                         if (SV->num_cars_east_left < 0) SV->num_cars_east_left = 0;
             break;
         case SS:
@@ -1048,17 +1048,17 @@ void autonomous_traffic_intersection_eventhandler(
             break;
         case WS:
             SV->WS_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_west--;
+            SV->num_cars_west--;
                         if (SV->num_cars_west < 0) SV->num_cars_west = 0;
             break;
         case WR:
             SV->WR_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_west--;
+            SV->num_cars_west--;
                         if (SV->num_cars_west < 0) SV->num_cars_west = 0;
             break;
         case WL:
             SV->WL_lock = tw_now(LP) + INTERSECTION_CROSSING_TIME;
-            SV->num_cars_north_west_left--;
+            SV->num_cars_west_left--;
                         if (SV->num_cars_west_left < 0) SV->num_cars_west_left = 0;
             break;
 
@@ -1155,14 +1155,14 @@ void autonomous_traffic_intersection_reverse_eventhandler(
                 if(M->car.x_to_go > 0) {
 
                     // Add a car in the west lane:
-                    SV->num_cars_north_west--;
+                    SV->num_cars_west--;
                         if (SV->num_cars_west < 0) SV->num_cars_west = 0;
 
                 }
                 else if(M->car.x_to_go < 0) {
 
                     // Add a car in the east lane:
-                    SV->num_cars_north--;
+                    SV->num_cars_east--;
                         if (SV->num_cars_east < 0) SV->num_cars_east = 0;
 
                 }
